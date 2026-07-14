@@ -16,7 +16,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen pb-12">
+<body class="bg-slate-50 text-slate-800 min-h-screen pb-24">
 
     <header class="bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-700 text-white shadow-md sticky top-0 z-40">
         <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -25,8 +25,8 @@
                     <i class="fa-solid fa-radiation text-2xl text-yellow-300 animate-spin-slow"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold tracking-wide">คลังข้อสอบ วิชารังสีเทคนิค 3 🧠</h1>
-                    <p class="text-xs text-cyan-100 opacity-90 font-light">ระบบจำลองข้อสอบ</p>
+                    <h1 class="text-xl font-bold tracking-wide">คลังข้อสอบรังสีเทคนิค 3 🧠</h1>
+                    <p class="text-xs text-cyan-100 opacity-90 font-light">ระบบจำลองข้อสอบดิจิทัลฉลาดเลือก</p>
                 </div>
             </div>
             
@@ -34,28 +34,57 @@
                 <span class="text-sm font-medium whitespace-nowrap text-cyan-100"><i class="fa-solid fa-folder-open mr-1"></i> ชุดข้อสอบ:</span>
                 <select id="setSelector" class="bg-white/10 text-white border border-white/20 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 w-full sm:w-48 cursor-pointer drop-shadow-sm [&>option]:text-slate-800">
                     <option value="all">📝 รวมข้อสอบทั้งหมด</option>
-                    <option value="r3-64">📅 ปี 2564</option>
-                    <option value="r3-65">📅 ปี 2565</option>
-                    <option value="r3-66">📅 ปี 2566</option>
+                    <option value="r3-64">📅 ประจำปี 2564</option>
+                    <option value="r3-65">📅 ประจำปี 2565</option>
+                    <option value="r3-66">📅 ประจำปี 2566</option>
                 </select>
             </div>
         </div>
     </header>
 
+    <div id="timerDashboard" class="bg-amber-500 text-white sticky top-[72px] z-30 shadow-sm hidden transition-all">
+        <div class="max-w-4xl mx-auto px-4 py-2.5 flex justify-between items-center font-bold text-sm sm:text-base">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-stopwatch animate-pulse"></i> โหมดฝึกทำข้อสอบจับเวลา
+            </div>
+            <div id="countdownClock" class="bg-black/20 px-3 py-1 rounded-lg tracking-wider text-xl font-mono">
+                00:00
+            </div>
+        </div>
+    </div>
+
     <div class="max-w-4xl mx-auto px-4 mt-6">
         <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-wrap justify-between items-center gap-4">
-            <div class="text-slate-500 text-sm font-medium">
-                <i class="fa-solid fa-circle-info text-blue-500 mr-1"></i> คลิกคำตอบเพื่อตรวจทันที และกดเปลี่ยนข้อยส์ได้ตลอดเวลา 👌
+            <div id="infoText" class="text-slate-500 text-sm font-medium">
+                <i class="fa-solid fa-circle-info text-blue-500 mr-1"></i> โหมดปกติ: คลิกคำตอบเพื่อตรวจทันที และกดเปลี่ยนช้อยส์ได้ตลอดเวลา 👌
             </div>
-            <button id="btnRandom" class="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-semibold text-sm px-4 py-2 rounded-xl transition-all shadow-sm hover:shadow active:scale-95">
-                <i class="fa-solid fa-shuffle"></i> สุ่มลำดับข้อสอบและช้อยส์ (Random)
-            </button>
+            <div class="flex items-center gap-2 flex-wrap">
+                <button id="btnExamMode" class="flex items-center gap-2 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-sm px-4 py-2 rounded-xl transition-all shadow-sm hover:shadow active:scale-95">
+                    <i class="fa-solid fa-hourglass-start"></i> เริ่มโหมดจับเวลา (Exam Mode)
+                </button>
+                <button id="btnRandom" class="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-semibold text-sm px-4 py-2 rounded-xl transition-all shadow-sm hover:shadow active:scale-95">
+                    <i class="fa-solid fa-shuffle"></i> สุ่มข้อสอบ (Random)
+                </button>
+            </div>
         </div>
     </div>
 
     <main class="max-w-4xl mx-auto px-4 mt-6">
+        <div id="resultCard" class="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 mb-6 text-center hidden transition-all">
+            <i class="fa-solid fa-trophy text-4xl text-amber-500 mb-2"></i>
+            <h3 class="text-xl font-bold text-emerald-900">สรุปคะแนนการทำข้อสอบ</h3>
+            <p id="scoreDisplay" class="text-3xl font-extrabold text-emerald-600 my-2">0 / 0</p>
+            <p class="text-slate-600 text-sm">ระบบได้ทำการเปิดแถบเฉลยและตรวจข้อผิดพลาดให้คุณครบทุกข้อแล้ว ด้านล่างนี้ครับ 👇</p>
+        </div>
+
         <div id="quizContainer" class="space-y-6">
             </div>
+
+        <div id="submitArea" class="mt-8 text-center hidden">
+            <button id="btnSubmitExam" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-lg px-8 py-4 rounded-2xl shadow-md hover:shadow-lg transition-all active:scale-95 w-full sm:w-64">
+                <i class="fa-solid fa-paper-plane mr-2"></i> ส่งข้อสอบและตรวจคะแนน
+            </button>
+        </div>
     </main>
 
     <div id="editModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50 transition-opacity duration-300">
@@ -110,7 +139,7 @@
             {id:"r3-64-q9",set:"r3-64",q:"เครื่องมือวัดรังสีประจำตัวบุคคลใดจัดอยู่ในประเภท active monitoring",choices:["OSL badges","Film badges","Electronic pocket dosimeters","Nuclear emulsion or track etch dosimeters","TLD badges"],ans:2},
             {id:"r3-64-q10",set:"r3-64",q:"การวินิจฉัยความผิดปกติของลำไส้ใหญ่ โดยการสวนแป้ง Barium sulfate ทางทวารหนัก ห้ามทำการตรวจในผู้ป่วยที่มีอาการเช่นไร",choices:["Rectal bleeding","Intestinal perforation","Polyps","Vomiting","Nausea"],ans:1},
             {id:"r3-64-q11",set:"r3-64",q:"วัตถุประสงค์หลักของการป้องกันอันตรายจากรังสีคืออะไร",choices:["ป้องกันการเกิด Deterministic effects และลดโอกาสเกิด Stochastic effects","ป้องกันการเกิด Deterministic และ Stochastic effects","ป้องกันการเกิด Hereditary effects และลดโอกาสเกิด Somatic effects","ป้องกันการเกิด Stochastic effects และลดโอกาสเกิด Deterministic effects","ป้องกันการเกิด Somatic effects และลดโอกาสเกิด Hereditary effects"],ans:0},
-            {id:"r3-64-q12",set:"r3-64",q:"Hp (0.07) ในรายงานผลบันทึกปริมาณรังสีบุคคล เป็นปริมาณรังสีที่จุดใด",choices:["ปริมาณรังสียังผลที่ผิวไหน","ปริมาณรังสียังผลที่ศีรษะ","ปริมาณรังสียังผลที่เลนส์ตา","ปริมาณรังสียังผลที่มือ","ปริมาณรังสียังผลที่เนื้อเยื่อใต้ผิวหนัง"],ans:0},
+            {id:"r3-64-q12",set:"r3-64",q:"Hp (0.07) ในรายงานผลบันทึกปริมาณรังสีบุคคล เป็นปริมาณรังสีที่จุดใด",choices:["ปริมาณรังสียังผลที่ผิวหนัง","ปริมาณรังสียังผลที่ศีรษะ","ปริมาณรังสียังผลที่เลนส์ตา","ปริมาณรังสียังผลที่มือ","ปริมาณรังสียังผลที่เนื้อเยื่อใต้ผิวหนัง"],ans:0},
             {id:"r3-64-q13",set:"r3-64",q:"กฎกำลังสองผกผัน หมายความว่า",choices:["เมื่อเราเพิ่มระยะห่างเป็นสองเท่า อัตราปริมาณรังสีลดลงครึ่งหนึ่ง","เมื่อเราเพิ่มระยะห่างเป็นสองเท่า อัตราปริมาณรังสีจะลดลงเหลือหนึ่งในสี่","เมื่อเราเพิ่มระยะห่างเป็นสองเท่า อัตราปริมาณรังสีจะเพิ่มขึ้นครึ่งเท่า","เมื่อเราลดระยะห่างลงครึ่งหนึ่ง อัตราปริมาณรังสีจะเพิ่มขึ้นสองเท่า","เมื่อเราลดระยะห่างลงเป็นหนึ่งในสี่ อัตราปริมาณรังสีเพิ่มเป็นสองเท่า"],ans:1},
             {id:"r3-64-q14",set:"r3-64",q:"ป้ายเตือนบริเวณรังสี เป็นรูปคล้ายใบพัด ข้อใดถูกต้องที่สุด",choices:["พื้นสีม่วง รูปใบพัดสีดำ","พื้นสีม่วง รูปใบพัดสีเหลือง","พื้นสีเหลือง รูปใบพัดสีม่วง","พื้นสีขาว รูปใบพัดสีดำ","พื้นสีเหลือง รูปใบพัดสีแดง"],ans:2},
             {id:"r3-64-q15",set:"r3-64",q:"การเรืองแสงแบบ phosphorescence แตกต่างจาก fluorescence คือ",choices:["รูปแบบของพลังงานที่ดูดกลืน","ความสว่าง","ระยะเวลาระหว่างการดูดกลืนพลังงานจนกระทั่งเรืองแสง","ไม่ต่างกัน","สีของแสง"],ans:2},
@@ -118,7 +147,7 @@
             {id:"r3-64-q17",set:"r3-64",q:"การผลิตเอกซเรย์ที่ใช้ในการถ่ายภาพอวัยวะภายในของผู้ป่วย สามารถทำได้โดยการใช้อะไรยิงใส่เป้า tungsten",choices:["อนุภาคอิเล็กตรอนความเร็วสูง","นิวตรอนความเร็วสูง","ความร้อนสูง","ไฟฟ้าแรงสูง","คลื่นแม่เหล็กไฟฟ้า"],ans:0},
             {id:"r3-64-q18",set:"r3-64",q:"ข้อใดเป็นผลของรังสีในระยะยาวแบบ Stochastic effects",choices:["ต้อกระจก","ผมร่วง","มะเร็ง","เป็นหมันชั่วคราว","ผิวหนังแดง, ไหม้"],ans:2},
             {id:"r3-64-q19",set:"r3-64",q:"โปรแกรมการจัดการเชิงคุณภาพ (Quality management program) ประกอบด้วยอะไรบ้าง",choices:["การส่งเสริมคุณภาพอย่างต่อเนื่อง (CQI)","การประกันคุณภาพ (QA) และ การควบคุมคุณภาพ (QC)","การประกันคุณภาพ (QA)","การประกันคุณภาพ (QA), การควบคุมคุณภาพ (QC), การส่งเสริมคุณภาพอย่างต่อเนื่อง (CQI)","การควบคุมคุณภาพ (QC)"],ans:3},
-            {id:"r3-64-q20",set:"r3-64",q:"ธาตุใดต่อไปนี้มีค่าชีวิตเฉลี่ย (Mean lifetime) สูงสุด",choices:["ธาตุซีเซียม-137 มีค่าความแรงรังสีตั้งต้นเท่ากับ 10 คูรี ครึ่งชีวิต 30 วัน","ธาตุแบเรียม-140 มีค่าความแรงรังสีตั้งต้นเท่ากับ 5 คูรี ครึ่งชีวิต 12.5 วัน","ธาตุอิริเดียม-192 มีค่าความแรงรังสีตั้งต้นเท่ากับ 10 เบคเคอเรล ครึ่งชีวิต 73.8 วัน","ธาตุไอโอดีน-131 มีค่าความแรงรังสีตั้งต้นเท่ากับ 5 เบคเคอเรล ครึ่งชีวิต 8.05 วัน","ธาตุทอเรียม-234 มีค่าความแรงรังสีตั้งต้นเท่ากับ 10 คูรี ครึ่งชีวิต 24.1 วัน"],ans:2},
+            {id:"r3-64-q20",set:"r3-64",q:"ธาตุใดต่อไปนี้มีค่าชีวิตเฉลี่ย (Mean lifetime) สูงสุด",choices:["ธาตุซีเซียม-137 มีค่าความแรงรังสีตั้งต้นเท่ากับ 10 คูรี ครึ่งชีวิต 30 วัน","ธาตุแบเรียม-140 มีค่าความแรงรังสีตั้งต้นเท่ากับ 5 คูรี ครึ่งชีวิต 12.5 วัน","ธาตุอิริเดียม-192 มีค่าความแรงรังสีตั้งต้นเท่ากับ 10 เบคเคอเรล ครึ่งชีวิต 73.8 วัน","ธาตุไอโอดีน-131 มีค่าความแรงรังสีตั้งต้นเท่ากับ 5 เบคเคอเรล ครึ่งชีวิต 8.05 วัน","ธาตุททอเรียม-234 มีค่าความแรงรังสีตั้งต้นเท่ากับ 10 คูรี ครึ่งชีวิต 24.1 วัน"],ans:2},
             {id:"r3-64-q21",set:"r3-64",q:"Interaction ชนิดใดที่ทำให้ Incident photon มีพลังงานลดลงแต่ยังคงอยู่",choices:["Pair production","Photoelectric effect","Coherent scattering","Photodisintegrations","Compton effect"],ans:4},
             {id:"r3-64-q22",set:"r3-64",q:"พิจารณาอะตอมของไฮโดรเจนของน้ำ ซึ่งวางอยู่ในที่ที่ไม่มีสนามแม่เหล็กจากภายนอกเข้าไปรบกวน ปริมาณในข้อใดต่อไปนี้มีค่าเป็นศูนย์",choices:["Kinetic energy","Atomic mass","Magnetic moment","Magnetization","Mass density"],ans:3},
             {id:"r3-64-q23",set:"r3-64",q:"สำหรับการเกิด Nuclear magnetic resonance ของนิวเคลียสไฮโดรเจน จะมีพลังงานที่นิวเคลียสของไฮโดรเจนคายออกมา พลังงานดังกล่าวนั้นจัดอยู่ในพวกใด",choices:["Microwave","Radio-frequency wave","Ultrasound","Infrared","X-ray photon"],ans:1},
@@ -148,7 +177,6 @@
             {id:"r3-64-q47",set:"r3-64",q:"อะตอม Tungsten มีระดับพลังงานที่ 1, 2 และ 3 เท่ากับ 70 keV, 12.0 keV และ 2.8 keV ตามลำดับ ถ้าอิเล็กตรอนของอะตอม Tungsten กระโดดจากระดับพลังงานที่ 3 สู่ระดับพลังงานที่ 1 พลังงานต่ำสุดที่มีโอกาสคายออกมามีค่าเท่าไร",choices:["58.0 eV","67.2 eV","2.8 eV","9.2 eV","12.0 eV"],ans:1},
             {id:"r3-64-q48",set:"r3-64",q:"ผู้ป่วยที่มีภาวะ hypoglycemia ควรได้รับการรักษาอย่างไร",choices:["ให้ 50% glucose","ให้ Oxygen mask","นวดปั๊มหัวใจ","ให้ 5% NaCl Solution","ให้ morphine"],ans:0},
             {id:"r3-64-q49",set:"r3-64",q:"ค่าการทำงานของไตที่แสดงถึงภาวะความเสี่ยงต่ำของการเกิด Contrast Induced Nephropathy (CIN) จากการฉีดสารทึบรังสีเข้าสู่หลอดเลือดดำคือข้อใด",choices:["GFR มากกว่า 60 mL/min/1.73 m²","GFR 50 mL/min/1.73 m²","GFR ต่ำกว่า 30 mL/min/1.73 m²","GFR 40 mL/min/1.73 m","ไม่มีข้อถูก"],ans:0},
-            {id:"r3-64-q50",set:"r3-64",q:"ในปฏิกิริยาแบบ indirect action ของรังสีเอกซ์กับเซลล์ ข้อใดต่อไปนี้ที่เป็นตัวทำให้ DNA ถูกทำลาย และทำให้เซลล์ของสิ่งมีชีวิตตายในที่สุด",choices:["Free radicals","Ionization","Nucleotide damage","Protein synthesis","RNA damage"],ans:0},
 
             // --- 2065 ---
             {id:"r3-65-q1",set:"r3-65",q:"การออกแบบห้องปฏิบัติการ เช่น ห้องเอกซเรย์ สำหรับผู้ปฏิบัติงานควรจะมีระดับปริมาณรังสีเท่าใด",choices:["ไม่เกิน 1 มิลลิซีเวิร์ดต่อสัปดาห์","ไม่เกิน 0.1 มิลลิซีเวิร์ดต่อสัปดาห์","ไม่เกิน 0.02 มิลลิซีเวิร์ดต่อสัปดาห์","ไม่เกิน 10 มิลลิซีเวิร์ดต่อสัปดาห์","เกิน 0.1 ซีเวิร์ดต่อสัปดาห์"],ans:1},
@@ -160,22 +188,22 @@
             {id:"r3-65-q7",set:"r3-65",q:"ข้อใดเป็นอันตรกิริยาหลักที่เกิดขึ้นในการถ่ายภาพเอกซเรย์กระดูกต้นขาที่ 40kVp",choices:["Compton Scattering","Photoelectric Absorption","Coherent Scattering","Pair Production","Annihilation"],ans:1},
             {id:"r3-65-q8",set:"r3-65",q:"ข้อใด ไม่ใช่ อันตรกิริยาระหว่างโฟตอนกับตัวกลาง",choices:["Photoelectric effect","Inelastic scattering","Compton scattering","Rayleigh scattering","Photodisintegration"],ans:1},
             {id:"r3-65-q9",set:"r3-65",q:"ข้อใดมีอัตราการติดเชื้อจากการปฏิบัติงานในโรงพยาบาลสูงที่สุด",choices:["Human Immunodeficiency Virus (HIV)","AIDS","Tuberculosis","Hepatitis B","Measles"],ans:3},
-            {id:"r3-65-q10",set:"r3-65",q:"เพราะเหตุใดเป้าโลหะของหลอดเอกซเรย์จึงต้องเอียงทำมุมกับแนวดิ่ง",choices:["เพิ่มจำนวนของรังสีเอกซ์","เพิ่มพลังงานรังสีเอกซ์","เพิ่มการเกิด Off focus radiation","เพิ่มการเกิดความร้อน","เพิ่มขนาด Effective focal spot"],ans:4},
+            {id:"r3-65-q10",set:"r3-65",q:"เพราะเหตุใดเป้าโลหะของหลอดเอกซเรย์จึงต้องเอียงทำมุมกับแนวดิ่ง",choices:["เพิ่มจำนวนของรังสีเอกซ์","เพิ่มพลังงานรังสีเอกซ์","ลดการเกิด Off focus radiation","เพิ่มการระบายความร้อน","ลดขนาด Effective focal spot"],ans:4},
             {id:"r3-65-q11",set:"r3-65",q:"ผลทางชีววิทยาสัมพันธ์ (Relative biological effectiveness; RBE) คือข้อใด",choices:["อัตราส่วนระหว่างปริมาณรังสีของรังสีอ้างอิงต่อปริมาณรังสีของรังสีที่ต้องการทราบค่า RBE โดยที่ปริมาณรังสีทั้งสองนี้จะทำให้เกิดผลทางชีววิทยาแตกต่างกัน","อัตราส่วนระหว่างผลทางชีววิทยาของรังสีที่ต้องการทราบค่า RBE ต่อผลทางชีววิทยาของรังสีอ้างอิง โดยที่ปริมาณรังสีทั้งสองนี้เท่ากัน","อัตราส่วนระหว่างผลทางชีววิทยาของรังสีอ้างอิงต่อผลทางชีววิทยาของรังสีที่ต้องการทราบค่า RBE โดยที่ปริมาณรังสีทั้งสองนี้เท่ากัน","อัตราส่วนระหว่างปริมาณรังสีของรังสีที่ต้องการทราบค่า RBE ต่อปริมาณรังสีของรังสีอ้างอิง โดยที่ปริมาณรังสีทั้งสองนี้จะทำให้เกิดผลทางชีววิทยาเดียวกัน","อัตราส่วนระหว่างปริมาณรังสีของรังสีอ้างอิงต่อปริมาณรังสีของรังสีที่ต้องการทราบค่า RBE โดยที่ปริมาณรังสีทั้งสองนี้จะทำให้เกิดผลทางชีววิทยาเดียวกัน"],ans:4},
             {id:"r3-65-q12",set:"r3-65",q:"วัฏจักรเซลล์ (Cell cycle) ในระยะใดมีความไวต่อรังสีมากที่สุด",choices:["G2/M phase","Late S phase","G0/G1 phase","Sub G0 phase","Early S phase"],ans:0},
             {id:"r3-65-q13",set:"r3-65",q:"แบบจำลองอะตอมช่วยแสดงให้เห็นว่าปริมาตรส่วนใหญ่ของอะตอมคือข้อใด",choices:["นิวตรอน","โปรตอน","นิวเคลียส","อิเล็กตรอน","ที่ว่าง"],ans:4},
             {id:"r3-65-q14",set:"r3-65",q:"อันตรกิริยาใดทำให้ Incident photon เปลี่ยนไปเฉพาะทิศทางการเคลื่อนที่เท่านั้น",choices:["Coherent scattering","Photoelectric effect","Pair production","Photodisintegration","Compton effect"],ans:0},
-            {id:"r3-65-q15",set:"r3-65",q:"ต้องใช้เวลาเป็นกี่เท่าของค่าครึ่งชีวิตเพื่อให้สารกัมมันตรังสีสลายตัวเหลือน้อยกว่า 1% ของสารกัมมันตรังสีเริ่มต้น",choices:["1 เท่า","5 เท่า","7 เท่า","3 เท่า","2 เท่า"],ans:2},
-            {id:"r3-65-q16",set:"r3-65",q:"ข้อใดเรียงลำดับการถ่ายเทพลังงานเชิงเส้น (Linear energy transfer; LET) จากมากไปน้อยได้ถูกต้อง",choices:["แกมมา -> โปรตอน -> ฮีเลียม -> คาร์บอน -> นีออด ","โปรตอน -> แกมมา -> ฮีเลียม -> คาร์บอน -> นีออน","นีออน -> คาร์บอน -> ฮีเลียม -> แกมมา -> โปรตอน","โปรตอน -> แกมมา -> ฮีเลียม -> นีออน -> คาร์บอน","นีออน -> คาร์บอน -> ฮีเลียม -> โปรตอน -> แกมมา"],ans:4},
+            {id:"r3-65-q15",set:"r3-65",q:"ต้องใช้เวลาเป็นกี่เท่าของค่าครึ่งชีวิตเพื่อให้สารกัมมันตรังสีสลายตัวเหลือน้อยกว่า 10% ของสารกัมมันตรังสีเริ่มต้น",choices:["1 เท่า","2.5 เท่า","3.4 เท่า","4.3 เท่า","5.2 เท่า"],ans:2},
+            {id:"r3-65-q16",set:"r3-65",q:"ข้อใดเรียงลำดับการถ่ายเทพลังงานเชิงเส้น (Linear energy transfer; LET) จากมากไปน้อยได้ถูกต้อง",choices:["แอลฟา -> โปรตอน -> แกมมา","คาร์บอน -> นีออน -> แอลฟา","แกมมา -> โปรตอน -> แอลฟา","แอลฟา -> คาร์บอน -> นีออน","นีออน -> คาร์บอน -> แอลฟา -> โปรตอน -> แกมมา"],ans:4},
             {id:"r3-65-q17",set:"r3-65",q:"ค่าใดที่ถูกนำมาใช้ในการคำนวณค่า CT number",choices:["X-ray absorption coefficient","Proton density","Linear energy transfer","Linear attenuation coefficient","Photon energy"],ans:3},
             {id:"r3-65-q18",set:"r3-65",q:"ข้อใด ไม่ใช่ ข้อกำหนดของมาตรฐานห้องปฏิบัติการทางรังสีวิทยา",choices:["สิ่งแวดล้อมภายในแผนกรังสีวิทยาสะอาด ปลอดโปร่ง","มีพื้นที่รับบริการผู้เข้ารับบริการอย่างเพียงพอ","มีการติดตั้งถังดับเพลิงที่เหมาะสม พร้อมใช้งาน และมีการตรวจสอบอย่างสม่ำเสมอ","มีบัญชีรายชื่อเครื่องมือในแผนกรังสีวิทยา แสดงข้อมูลที่สำคัญ","ห้องอ่านผลของรังสีแพทย์ อยู่ภายในบริเวณห้องถ่ายภาพรังสี"],ans:4},
-            {id:"r3-65-q19",set:"r3-65",q:"ข้อใดถูกต้องเกี่ยวกับภาวะฉุกเฉินทางรังสี",choices:["ภาวะฉุกเฉินทางรังสีระดับ 3 สถานการณ์ขยายขอบเขตออกไปทั่วอาณาบริเวณของประเทศที่เกิดอุบัติเหตุทางรังสี","ภาวะฉุกเฉินทางรังสีระดับ 2 สถานการณ์ขยายขอบเขตออกไป ณ อาณาบริเวณของโรงงาน สถาบันการศึกษาวิจัย หรือโรงพยาบาลที่เกิดอุบัติเหตุทางรังสี","ภาวะฉุกเฉินทางรังสีระดับ 4 สถานการณ์อาจมีผลกระทบต่อภูมิภาคข้างเคียง","ภาวะฉุกเฉินทางรังสีระดับ 1 สถานการณ์มีขอบเขตอยู่ภายในห้องทดลอง ห้องปฏิบัติการหรือภายในอาคาร","ภาวะฉุกเฉินทางรังสีระดับ 3 สถานการณ์อาจมีผลกระทบต่อสถานที่ข้างเคียง"],ans:3},
+            {id:"r3-65-q19",set:"r3-65",q:"ข้อใดถูกต้องเกี่ยวกับภาวะฉุกเฉินทางรังสี",choices:["ภาวะฉุกเฉินทางรังสีระดับ 3 สถานการณ์ขยายขอบเขตออกไปทั่วอาณาบริเวณของประเทศที่เกิดอุบัติเหตุทางรังสี","ภาวะฉุกเฉินทางรังสีระดับ 2 สถานการณ์ขยายขอบเขตออกไป ณ อาณาบริเวณของโรงงาน สถาบันการศึกษาวิจัย หรือโรงพยาบาลที่เกิดอุบัติเหตุทางรังสี","ภาวะฉุกเฉินทางรังสีระดับ 4 สถานการณ์อาจมีผลกระทบต่อภูมิภาคข้างเคียง","ภาวะฉุกเฉินทางรังสีระดับ 1 สถานการณ์มีขอบเขตอยู่ภายในห้องปฏิบัติการหรือภายในอาคาร","ภาวะฉุกเฉินทางรังสีระดับ 3 สถานการณ์อาจมีผลกระทบต่อสถานที่ข้างเคียง"],ans:3},
             {id:"r3-65-q20",set:"r3-65",q:"การใช้งาน OSL ในข้อใดต่อไปนี้เหมาะสมที่สุด",choices:["ติด OSL ไว้ที่กระเป๋าเสื้อบริเวณหน้าอก โดยหันด้านที่มี Filter เข้าด้านใน","เก็บ OSL หลังปฏิบัติงาน ไว้ในตู้เก็บอุปกรณ์ในห้องเอกซเรย์","ติด OSL ด้านนอกเสื้อตะกั่วขณะทำ Fluoroscopy","ใช้ OSL ประเภท Extremity dosimeter เพื่อวัดรังสีเฉพาะที่บริเวณนิ้วมือ","ถอดการ์ด OSL ตากแดด เพื่อลดความชื้น"],ans:3},
             {id:"r3-65-q21",set:"r3-65",q:"นิวไคลด์ที่มีเลขมวลเท่ากัน แต่มีเลขอะตอมไม่เท่ากัน สอดคล้องกับตัวเลือกใด",choices:["Isobar","Isomer","Radioisotope","Isotone","Isotope"],ans:0},
             {id:"r3-65-q22",set:"r3-65",q:"การแนะนำผู้ป่วยที่เข้ารับการตรวจ Bone scan ที่ถูกต้องคือข้อใด",choices:["ผู้ป่วยที่ตรวจ Lung scan สามารถเข้าตรวจ Bone scan ต่อได้ทันที เนื่องจากใช้สารกัมมันตรังสีเดียวกัน","ผู้ป่วยควรดื่มน้ำมากๆ และปัสสาวะบ่อยๆ ระหว่างรอเข้ารับการสแกน","ผู้ป่วยควรงดน้ำและอาหารก่อนตรวจ Bone scan 4-6 ชั่วโมง","หญิงให้นมบุตร สามารถให้นมบุตรได้ทันทีภายหลังการสแกนเสร็จ","ผู้ป่วยหญิงตั้งครรภ์สามารถเข้ารับการตรวจได้ตามปกติ"],ans:1},
             {id:"r3-65-q23",set:"r3-65",q:"ข้อใดเป็นอาการแสดงที่เกิดขึ้นเมื่อผู้ป่วยแพ้สารทึบรังสี (Contrast media) อย่างรุนแรง",choices:["Hypotension","Nausea","Urticaria","Anaphylaxis","Vomiting"],ans:3},
             {id:"r3-65-q24",set:"r3-65",q:"รังสีชนิดใดมีคุณสมบัติของ Bragg peak",choices:["Neutron","Electron","Proton","X-ray","Gamma"],ans:2},
-            {id:"r3-65-q25",set:"r3-65",q:"ผู้ป่วยรายหนึ่งได้รับปริมาณรังสีดูดกลืน 2 มิลลิเกรย์ จากรังสีแอลฟาและรังสีเอกซ์ อยากทราบว่าผู้ป่วยรายนี้ได้รับปริมาณรังสีสมมูลทั่วร่างกายเท่าใด",choices:["22 มิลลิซีเวิร์ด","2 มิลลิซีเวิร์ด","12 มิลลิซีเวิร์ด","32 มิลลิซีเวิร์ด","42 มิลลิซีเวิร์ด"],ans:0},
+            {id:"r3-65-q25",set:"r3-65",q:"ผู้ป่วยรายหนึ่งได้รับปริมาณรังสีดูดกลืน 2 มิลลิเกรย์ จากรังสีแอลฟาและรังสีเอกซ์ (อย่างละ 1 มิลลิเกรย์) อยากทราบว่าผู้ป่วยรายนี้ได้รับปริมาณรังสีสมมูลทั่วร่างกายเท่าใด",choices:["22 มิลลิซีเวิร์ด","2 มิลลิซีเวิร์ด","12 มิลลิซีเวิร์ด","32 มิลลิซีเวิร์ด","42 มิลลิซีเวิร์ด"],ans:0},
             {id:"r3-65-q26",set:"r3-65",q:"ข้อใดอธิบาย ผิด เกี่ยวกับภาวะช็อค (Shock)",choices:["เนื้อเยื่อต่างๆ ของร่างกายได้รับเลือดไปเลี้ยงไม่เพียงพอ","ไม่สามารถควบคุมการทำงานของหลอดเลือดได้","ออกซิเจนไปเลี้ยงอวัยวะต่าง ๆ ไม่เพียงพอ","สูญเสียการทำงานของระบบประสาท","เกิดจากการทำงานที่ผิดปกติของเซลล์ประสาทพร้อมกันอย่างกะทันหัน"],ans:4},
             {id:"r3-65-q27",set:"r3-65",q:"รังสีเอกซ์ที่เกิดจากการที่อิเล็กตรอนพลังงานสูงถูกหน่วง ทำให้เลิกตรอนวิ่งช้าลงหรือหยุดวิ่ง เรียกว่าอะไร",choices:["Internal conversion","Electron capture","Auger electron","Characteristic radiation","Bremsstrahlung radiation"],ans:4},
             {id:"r3-65-q28",set:"r3-65",q:"หน่วยงานใดมีหน้าที่ควบคุมคุณภาพเครื่องเอกซเรย์ในประเทศไทย",choices:["สำนักงานปรมาณูเพื่อสันติ","กรมวิทยาศาสตร์การแพทย์","กระทรวงการอุดมศึกษา วิทยาศาสตร์ วิจัยและนวัตกรรม","สถาบันเทคโนโลยีนิวเคลียร์แห่งชาติ","กรมการแพทย์"],ans:1},
@@ -224,7 +252,7 @@
             {id:"r3-66-q19",set:"r3-66",q:"ข้อใด ไม่ใช่ การนำหลัก ALARA มาใช้สำหรับผู้ป่วยที่มารับการถ่ายภาพทางรังสี",choices:["การใช้ DRLs เป็นระดับอ้างอิงในการตรวจแต่ละชนิด","การถ่ายภาพทางรังสีให้ได้ภาพที่มีคุณภาพดีที่สุดโดยไม่คำนึงถึงปริมาณรังสีที่ได้รับ","การใช้เทคนิคการถ่ายภาพเฉพาะสำหรับผู้ป่วยเด็กเพื่อควบคุมปริมาณรังสีที่ได้รับ","การเลือกเทคนิคการถ่ายภาพให้เหมาะสมกับผู้ป่วยแต่ละคน","การใช้อุปกรณ์กำบังรังสีเพื่อป้องกันอวัยวะที่มีความไวต่อรังสีที่อยู่ใกล้บริเวณที่ทำการตรวจ"],ans:1},
             {id:"r3-66-q20",set:"r3-66",q:"ข้อใดเป็นกระบวนการสร้างภาพของ MRI",choices:["Chemical shift","Back projection","Iterative reconstruction","2D-Fourier transforms","Filtered back projection"],ans:3},
             {id:"r3-66-q21",set:"r3-66",q:"ข้อใด ไม่ใช่ ผลที่เกิดจากการได้รับรังสีแบบ Deterministic Effects",choices:["Genetic mutation","Infertility","Skin redness","Cataract","Hair loss"],ans:0},
-            {id:"r3-66-q22",set:"r3-66",q:"ข้อใดกล่าว ไม่ถูกต้อง เกี่ยวกับการรักษาผู้ป่วยมะเร็งต่อมไทรอยด์ด้วยน้ำแร่ไอโอดีน มากกว่า 30 mCi",choices:["ผู้ป่วยไม่ควรมีปฏิสัมพันธ์กับบุคคลอื่นที่ไม่เกี่ยวข้อง","ผู้ป่วยจะได้รับการอธิบายขั้นตอนการรักษาอย่างละเอียดพร้อมผลข้างเคียงที่อาจจะเกิดขึ้น","หลังจากการกินน้ำแร่ไอโอดีนเพื่อการรักษาผู้ป่วยต้องดื่มน้ำตามให้มากที่สุดเท่าที่เป็นไปได้","ผู้ป่วยสามารถกลับบ้านได้ทันทีหลังจากได้รับการรักษาด้วยน้ำแร่ไอโอดีน","ผู้ป่วยจำเป็นต้องนอนรักษาตัวที่วอร์ดเฉพาะจนกว่าปริมาณรังสีที่แผ่ออกมาจากตัวผู้ป่วยที่ระยะหนึ่งเมตรต้องน้อยกว่า 70 ไมโครซีเวิร์ตต่อชั่วโมง"],ans:3},
+            {id:"r3-66-q22",set:"r3-66",q:"ข้อใดกล่าว ไม่ถูกต้อง เกี่ยวกับการรักษาผู้ป่วยมะเร็งต่อมไทรอยด์ด้วยน้ำแร่ไอโอดีน มากกว่า 30 mCi",choices:["ผู้ป่วยไม่ควรมีิปฏิสัมพันธ์กับบุคคลอื่นที่ไม่เกี่ยวข้อง","ผู้ป่วยจะได้รับการอธิบายขั้นตอนการรักษาอย่างละเอียดพร้อมผลข้างเคียงที่อาจจะเกิดขึ้น","หลังจากการกินน้ำแร่ไอโอดีนเพื่อการรักษาผู้ป่วยต้องดื่มน้ำตามให้มากที่สุดเท่าที่เป็นไปได้","ผู้ป่วยสามารถกลับบ้านได้ทันทีหลังจากได้รับการรักษาด้วยน้ำแร่ไอโอดีน","ผู้ป่วยจำเป็นต้องนอนรักษาตัวที่วอร์ดเฉพาะจนกว่าปริมาณรังสีที่แผ่ออกมาจากตัวผู้ป่วยที่ระยะหนึ่งเมตรต้องน้อยกว่า 70 ไมโครซีเวิร์ตต่อชั่วโมง"],ans:3},
             {id:"r3-66-q23",set:"r3-66",q:"การแบ่งประเภทของรังสีตามความสามารถในการทำให้เกิดอันตรกิริยา (Interaction) กับตัวกลาง คือข้อใด",choices:["รังสีที่มีพลังงานสูงและรังสีที่มีพลังงานต่ำ","รังสีที่มีประจุไฟฟ้าและรังสีที่ไม่มีประจุไฟฟ้า","รังสีที่ไม่ก่อให้เกิดไอออนและรังสีที่ก่อให้เกิดไอออน","รังสีที่มีอำนาจทะลุทะลวงสูงและรังสีที่มีอำนาจทะลุทะลวงต่ำ","รังสีที่มีความถี่สูงและรังสีที่มีความถี่ต่ำ"],ans:2},
             {id:"r3-66-q24",set:"r3-66",q:"ข้อใดกล่าว ผิด เกี่ยวกับการดูแลปฏิบัติตัวสำหรับผู้ป่วยมะเร็งปากมดลูกที่ได้รับการรักษาด้วยรังสี",choices:["ควรมีการสวนล้างช่องคลอดให้สะอาดอยู่เสมอ","หลีกเลี่ยงการขัดถูบริเวณที่ฉายรังสี","หลังการรักษาหากมีภาวะช่องคลอดแห้งสามารถพิจารณาใช้เจลเพิ่มความชุ่มชื้นให้ช่องคลอดได้","ควรรับประทานอาหารอ่อน ย่อยง่าย สุก สะอาด เพื่อป้องกันอาการท้องเสีย","งดมีเพศสัมพันธ์ในระหว่างการฉายรังสีและการใส่แร่ เพื่อป้องกันการอักเสบและติดเชื้อ"],ans:0},
             {id:"r3-66-q25",set:"r3-66",q:"ข้อใดคือกระบวนการที่อะตอมหรือโมเลกุลได้รับพลังงานแล้วทำให้อิเล็กตรอนหลุดออกจากอะตอม ทำให้เกิดประจุลบและประจุบวก",choices:["Luminescence","Excitation","Phosphorescence","Ionization","Fluorescence"],ans:3},
@@ -256,17 +284,16 @@
         ];
 
         // --- FIREBASE SETUP MODE ---
-        // แปะคีย์จริงตรงนี้เพื่อเชื่อมต่อระบบฐานข้อมูลคลาวด์แบบ Realtime
-const firebaseConfig = {
-  apiKey: "AIzaSyAn5FXrhPWnKS5HEjdf8QuOVNfvtZNkf-g",
-  authDomain: "ans3-63eef.firebaseapp.com",
-  databaseURL: "https://ans3-63eef-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "ans3-63eef",
-  storageBucket: "ans3-63eef.firebasestorage.app",
-  messagingSenderId: "739800695575",
-  appId: "1:739800695575:web:84dc35801f208f11b9ed52",
-  measurementId: "G-X56CBC9EC0"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyAn5FXrhPWnKS5HEjdf8QuOVNfvtZNkf-g",
+            authDomain: "ans3-63eef.firebaseapp.com",
+            databaseURL: "https://ans3-63eef-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "ans3-63eef",
+            storageBucket: "ans3-63eef.firebasestorage.app",
+            messagingSenderId: "739800695575",
+            appId: "1:739800695575:web:84dc35801f208f11b9ed52", 
+            measurementId: "G-X56CBC9EC0"
+        };
 
         let db = null;
         let isFirebaseActive = false;
@@ -287,25 +314,36 @@ const firebaseConfig = {
         let userAnswers = {}; // { quizId: selectedIndex }
         let isRandomized = false;
         
-        // ข้อมูลจำลองเมื่อไม่มี Firebase
-        let localCloudUpdates = {}; // { quizId: { ans: index, updatedBy: string } }
+        // EXAM MODE STATE
+        let isExamMode = false;
+        let isExamSubmitted = false;
+        let examTimer = null;
+        let remainingTime = 0; // ในหน่วยวินาที
+
+        let localCloudUpdates = {}; 
 
         // --- DOM ELEMENTS ---
         const quizContainer = document.getElementById('quizContainer');
         const setSelector = document.getElementById('setSelector');
         const btnRandom = document.getElementById('btnRandom');
+        const btnExamMode = document.getElementById('btnExamMode');
+        const timerDashboard = document.getElementById('timerDashboard');
+        const countdownClock = document.getElementById('countdownClock');
+        const submitArea = document.getElementById('submitArea');
+        const btnSubmitExam = document.getElementById('btnSubmitExam');
+        const resultCard = document.getElementById('resultCard');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const infoText = document.getElementById('infoText');
 
         // --- INIT APP ---
         window.addEventListener('DOMContentLoaded', () => {
             if (isFirebaseActive) {
-                // ดึงข้อมูล Realtime sync จาก Firebase เพื่ออัปเดตเฉลย
                 db.ref('quizzes').on('value', (snapshot) => {
                     const data = snapshot.val();
                     if (data) {
                         Object.keys(data).forEach(qId => {
                             const cloudItem = data[qId];
                             localCloudUpdates[qId] = cloudItem;
-                            // ซิงค์ลงใน data Array หลัก
                             const found = currentQuizData.find(x => x.id === qId);
                             if (found) {
                                 found.ans = cloudItem.ans;
@@ -325,13 +363,16 @@ const firebaseConfig = {
             isRandomized = false; 
             btnRandom.classList.remove('bg-purple-600', 'hover:bg-purple-700');
             btnRandom.classList.add('bg-amber-500', 'hover:bg-amber-600');
+            
+            // ถ้าอยู่ในระหว่างสอบ ให้ปิดโหมดสอบก่อนเพื่อดึงข้อมูลชุดใหม่
+            if (isExamMode) {
+                exitExamMode();
+            }
             resetDataState();
         });
 
         function resetDataState() {
-            // โหลดข้อมูลดิบใหม่
             currentQuizData = JSON.parse(JSON.stringify(rawQuizzes));
-            // ปลั๊กอินคลาวด์/เมมโมรี่จำลอง
             Object.keys(localCloudUpdates).forEach(qId => {
                 const found = currentQuizData.find(x => x.id === qId);
                 if (found) {
@@ -342,15 +383,13 @@ const firebaseConfig = {
             renderQuiz();
         }
 
-        function renderQuiz() {
+        function getActiveList() {
             const currentFilter = setSelector.value;
-            let listToRender = currentQuizData;
+            return currentFilter === 'all' ? currentQuizData : currentQuizData.filter(item => item.set === currentFilter);
+        }
 
-            if (currentFilter !== 'all') {
-        listToRender = currentQuizData.filter(item => item.set === currentFilter);
-    } else {
-        listToRender = currentQuizData; // มั่นใจว่าโหลดครั้งแรกสุดจะแสดงข้อสอบทุกปีออกมารวมกันทันที
-    }
+        function renderQuiz() {
+            let listToRender = getActiveList();
 
             if (listToRender.length === 0) {
                 quizContainer.innerHTML = `<div class="text-center py-12 bg-white rounded-2xl border text-slate-400 font-medium">ไม่พบข้อสอบในชุดนี้</div>`;
@@ -364,7 +403,6 @@ const firebaseConfig = {
                 quizBox.className = "bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200/80 transition-all hover:shadow-md relative overflow-hidden";
                 quizBox.id = `box-${item.id}`;
 
-                // Header ข้อสอบ
                 const labelYear = item.set === 'r3-64' ? 'ปี 2564' : item.set === 'r3-65' ? 'ปี 2565' : 'ปี 2566';
                 let headerHtml = `
                     <div class="flex justify-between items-start gap-4 mb-3">
@@ -378,7 +416,6 @@ const firebaseConfig = {
                     <h2 class="text-base sm:text-lg font-semibold text-slate-800 leading-relaxed mb-3">${item.q}</h2>
                 `;
 
-                // การจัดการรูปภาพประจำข้อ (ดักจับฟิลด์ img)
                 if (item.img && item.img.trim() !== '') {
                     headerHtml += `
                         <div class="my-3 text-center">
@@ -387,7 +424,6 @@ const firebaseConfig = {
                     `;
                 }
 
-                // Render ช้อยส์ตัวเลือก
                 let choicesHtml = `<div class="space-y-2.5 mt-4">`;
                 const userChoice = userAnswers[item.id];
                 
@@ -395,24 +431,33 @@ const firebaseConfig = {
                     let btnStyle = "border-slate-200 hover:bg-slate-50 text-slate-700 bg-white";
                     let iconHtml = `<div class="w-6 h-6 rounded-full border border-slate-300 flex items-center justify-center text-xs font-bold text-slate-400 bg-slate-50 shrink-0">${cIdx + 1}</div>`;
 
-                    if (userChoice !== undefined) {
-                        // เมื่อมีการคลิกตรวจปั๊บ
-                        if (cIdx === item.ans) {
-                            // ข้อที่เฉลยถูกต้อง
-                            btnStyle = "border-emerald-500 bg-emerald-50 text-emerald-900 font-medium ring-1 ring-emerald-500";
-                            iconHtml = `<div class="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-xs font-bold text-white shrink-0"><i class="fa-solid fa-check"></i></div>`;
-                        } else if (cIdx === userChoice) {
-                            // ข้อที่ผู้ใช้ตอบผิด
-                            btnStyle = "border-red-400 bg-red-50 text-red-900 ring-1 ring-red-400";
-                            iconHtml = `<div class="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center text-xs font-bold text-white shrink-0"><i class="fa-solid fa-xmark"></i></div>`;
-                        } else {
-                            // ช้อยส์อื่นๆ ปรับความโปร่งแสงลงตามเงื่อนไข
-                            btnStyle = "border-slate-200 text-slate-400 opacity-60 bg-white pointer-events-auto";
+                    // คัดแยก Logic ระหว่าง Exam mode กับ Normal Mode
+                    if (isExamMode && !isExamSubmitted) {
+                        // โหมดสอบ: เลือกแล้วไฮไลต์แค่สีฟ้าอ่อนเพื่อให้รู้ว่าเลือกข้อไหน ยังไม่ตรวจทันที
+                        if (cIdx === userChoice) {
+                            btnStyle = "border-blue-500 bg-blue-50 text-blue-900 font-medium ring-1 ring-blue-500";
+                            iconHtml = `<div class="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-xs font-bold text-white shrink-0">${cIdx + 1}</div>`;
+                        }
+                    } else {
+                        // โหมดปกติ หรือ โหมดสอบที่ส่งคำตอบตรวจแล้ว
+                        if (userChoice !== undefined) {
+                            if (cIdx === item.ans) {
+                                btnStyle = "border-emerald-500 bg-emerald-50 text-emerald-900 font-medium ring-1 ring-emerald-500";
+                                iconHtml = `<div class="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-xs font-bold text-white shrink-0"><i class="fa-solid fa-check"></i></div>`;
+                            } else if (cIdx === userChoice) {
+                                btnStyle = "border-red-400 bg-red-50 text-red-900 ring-1 ring-red-400";
+                                iconHtml = `<div class="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center text-xs font-bold text-white shrink-0"><i class="fa-solid fa-xmark"></i></div>`;
+                            } else {
+                                btnStyle = "border-slate-200 text-slate-400 opacity-60 bg-white pointer-events-auto";
+                            }
                         }
                     }
 
+                    // ดักจับการห้ามกดปุ่มกรณีส่งข้อสอบในโหมดจับเวลาเรียบร้อยแล้ว
+                    const disableAttr = isExamSubmitted ? 'disabled' : '';
+
                     choicesHtml += `
-                        <button onclick="selectAnswer('${item.id}', ${cIdx})" class="w-full text-left p-3.5 rounded-xl border text-sm sm:text-base flex items-center gap-3 transition-all duration-150 active:scale-[0.99] ${btnStyle}">
+                        <button ${disableAttr} onclick="selectAnswer('${item.id}', ${cIdx})" class="w-full text-left p-3.5 rounded-xl border text-sm sm:text-base flex items-center gap-3 transition-all duration-150 active:scale-[0.99] ${btnStyle}">
                             ${iconHtml}
                             <span class="flex-1 leading-normal">${choice}</span>
                         </button>
@@ -420,9 +465,9 @@ const firebaseConfig = {
                 });
                 choicesHtml += `</div>`;
 
-                // แถบเฉลยสั้นๆ แบบกล่องสีฟ้าใต้ช้อยส์ที่เลือกแล้ว
                 let feedbackHtml = '';
-                if (userChoice !== undefined) {
+                // กล่องสีฟ้าเฉลยคำตอบ จะขึ้นก็ต่อเมื่อ: โหมดปกติที่มีการตอบแล้ว OR โหมดสอบที่ส่งคำตอบตรวจแล้วเท่านั้น
+                if ((!isExamMode && userChoice !== undefined) || (isExamMode && isExamSubmitted)) {
                     feedbackHtml = `
                         <div class="mt-4 p-3 bg-cyan-50 border border-cyan-100 rounded-xl text-cyan-800 text-sm font-bold flex items-center gap-2">
                             <i class="fa-solid fa-lightbulb text-cyan-500"></i> เฉลยคือข้อ ${item.ans + 1}
@@ -430,7 +475,6 @@ const firebaseConfig = {
                     `;
                 }
 
-                // ประวัติคลาวด์อัปเดตเฉลยโดย (ไม่แสดงวันเวลา)
                 let cloudUpdateHtml = '';
                 if (item.updatedBy) {
                     cloudUpdateHtml = `
@@ -447,10 +491,129 @@ const firebaseConfig = {
             });
         }
 
-        // --- ANSWER SELECTION SYSTEM (เปลี่ยนช้อยส์ไปมาได้อิสระ) ---
+        // --- ANSWER SELECTION SYSTEM ---
         function selectAnswer(quizId, choiceIndex) {
             userAnswers[quizId] = choiceIndex;
             renderQuiz();
+        }
+
+        // --- EXAM MODE & TIMER SYSTEM (จับเวลาถอยหลัง ส่งแล้วค่อยคำนวณผล) ---
+        btnExamMode.addEventListener('click', () => {
+            if (!isExamMode) {
+                // ยืนยันเข้าโหมดสอบ
+                const listCount = getActiveList().length;
+                if (confirm(`คุณต้องการเปิดโหมดฝึกทำข้อสอบจับเวลาใช่ไหม?\nระบบจะให้เวลาข้อละ 1 นาที (รวมทั้งหมด ${listCount} นาที) เมื่อทำครบถ้วนแล้วให้กดปุ่มส่งข้อสอบด้านล่างสุดครับ`)) {
+                    startExamMode(listCount * 60); // 1 นาที ต่อ 1 ข้อ
+                }
+            } else {
+                // ยกเลิกและกลับสู่โหมดปกติ
+                if (confirm("คุณต้องการยกเลิกโหมดจับเวลาและกลับสู่โหมดฝึกฝนปกติใช่หรือไม่? (คะแนนปัจจุบันจะถูกล้าง)")) {
+                    exitExamMode();
+                }
+            }
+        });
+
+        function startExamMode(durationSeconds) {
+            isExamMode = true;
+            isExamSubmitted = false;
+            userAnswers = {}; // เคลียร์คำตอบเก่าออก
+            resultCard.classList.add('hidden');
+            
+            // ปรับแต่ง UI และปุ่มต่างๆ
+            btnExamMode.innerHTML = `<i class="fa-solid fa-circle-stop"></i> ออกจากโหมดจับเวลา`;
+            btnExamMode.className = "flex items-center gap-2 bg-slate-700 hover:bg-slate-800 text-white font-semibold text-sm px-4 py-2 rounded-xl transition-all shadow-sm hover:shadow active:scale-95";
+            infoText.innerHTML = `<i class="fa-solid fa-stopwatch text-rose-500 mr-1"></i> โหมดจับเวลา: เลือกคำตอบที่ต้องการ ระบบจะยังไม่เฉลยจนกว่าจะกดปุ่มส่งข้อสอบด้านล่างสุด ⏳`;
+            
+            timerDashboard.classList.remove('hidden');
+            submitArea.classList.remove('hidden');
+
+            // เริ่มนับเวลาถอยหลัง
+            remainingTime = durationSeconds;
+            updateClockDisplay();
+            
+            clearInterval(examTimer);
+            examTimer = setInterval(() => {
+                remainingTime--;
+                updateClockDisplay();
+                
+                if (remainingTime <= 0) {
+                    clearInterval(examTimer);
+                    alert("⏰ หมดเวลาทำข้อสอบแล้ว! ระบบจะทำการส่งคำตอบและตรวจคะแนนของคุณโดยอัตโนมัติ");
+                    submitExam();
+                }
+            }, 1000);
+
+            renderQuiz();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateClockDisplay() {
+            const minutes = Math.floor(remainingTime / 60);
+            const seconds = remainingTime % 60;
+            countdownClock.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // เปลี่ยนสีแจ้งเตือนถ้าเหลือน้อยกว่า 1 นาที
+            if (remainingTime < 60) {
+                timerDashboard.className = "bg-rose-600 text-white sticky top-[72px] z-30 shadow-sm transition-all";
+            } else {
+                timerDashboard.className = "bg-amber-500 text-white sticky top-[72px] z-30 shadow-sm transition-all";
+            }
+        }
+
+        function exitExamMode() {
+            isExamMode = false;
+            isExamSubmitted = false;
+            clearInterval(examTimer);
+            userAnswers = {};
+            
+            timerDashboard.classList.add('hidden');
+            submitArea.classList.add('hidden');
+            resultCard.classList.add('hidden');
+
+            btnExamMode.innerHTML = `<i class="fa-solid fa-hourglass-start"></i> เริ่มโหมดจับเวลา (Exam Mode)`;
+            btnExamMode.className = "flex items-center gap-2 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-sm px-4 py-2 rounded-xl transition-all shadow-sm hover:shadow active:scale-95";
+            infoText.innerHTML = `<i class="fa-solid fa-circle-info text-blue-500 mr-1"></i> โหมดปกติ: คลิกคำตอบเพื่อตรวจทันที และกดเปลี่ยนช้อยส์ได้ตลอดเวลา 👌`;
+            
+            resetDataState();
+        }
+
+        // ปุ่มส่งข้อสอบเพื่อตรวจผลคะแนนทั้งหมดพร้อมกัน
+        btnSubmitExam.addEventListener('click', () => {
+            const listToRender = getActiveList();
+            const answeredCount = Object.keys(userAnswers).length;
+
+            if (answeredCount < listToRender.length) {
+                if (!confirm(`⚠️ คุณยังทำข้อสอบไม่ครบ (ทำไปแล้ว ${answeredCount} จากทั้งหมด ${listToRender.length} ข้อ)\nคุณต้องการยืนยันที่จะส่งข้อสอบเลยหรือไม่?`)) {
+                    return;
+                }
+            } else {
+                if (!confirm("คุณต้องการยืนยันส่งกระดาษคำตอบและตรวจคะแนนใช่หรือไม่?")) {
+                    return;
+                }
+            }
+            submitExam();
+        });
+
+        function submitExam() {
+            clearInterval(examTimer);
+            isExamSubmitted = true;
+            submitArea.classList.add('hidden');
+
+            // คำนวณคะแนน
+            const listToRender = getActiveList();
+            let score = 0;
+            listToRender.forEach(item => {
+                if (userAnswers[item.id] !== undefined && userAnswers[item.id] === item.ans) {
+                    score++;
+                }
+            });
+
+            // แสดง Dashboard สรุปผลคะแนน
+            scoreDisplay.innerText = `${score} / ${listToRender.length}`;
+            resultCard.classList.remove('hidden');
+
+            renderQuiz(); // วาดหน้าจอใหม่เพื่อเปิดสวิตช์แสดงผลเฉลย แดง/เขียว และกล่องฟ้า
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // --- RANDOM MODE SYSTEM ---
@@ -459,28 +622,23 @@ const firebaseConfig = {
             btnRandom.classList.remove('bg-amber-500', 'hover:bg-amber-600');
             btnRandom.classList.add('bg-purple-600', 'hover:bg-purple-700');
 
-            // 1. สุ่มสลับโจทย์หลักทั้งหมด
             for (let i = currentQuizData.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [currentQuizData[i], currentQuizData[j]] = [currentQuizData[j], currentQuizData[i]];
             }
 
-            // 2. สับช้อยส์ภายในข้ออย่างแม่นยำ และแปลงค่า Index เฉลยใหม่ไม่ให้หลุดตำแหน่ง
             currentQuizData.forEach(item => {
-                // เก็บอาเรย์ออบเจกต์จำค่าดั้งเดิมไว้
                 let mappedChoices = item.choices.map((c, index) => {
                     return { text: c, isCorrect: index === item.ans };
                 });
 
-                // สุ่มสับช้อยส์ 1-5
                 for (let i = mappedChoices.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [mappedChoices[i], mappedChoices[j]] = [mappedChoices[j], mappedChoices[i]];
                 }
 
-                // สรุปข้อมูลกลับคืนลงออบเจกต์
                 item.choices = mappedChoices.map(x => x.text);
-                item.ans = mappedChoices.findIndex(x => x.isCorrect); // หาตำแหน่งดัชนีเฉลยใหม่แม่นยำ
+                item.ans = mappedChoices.findIndex(x => x.isCorrect); 
             });
 
             renderQuiz();
@@ -488,7 +646,6 @@ const firebaseConfig = {
 
         // --- MODAL & FIREBASE DATABASE WRITE SYSTEM ---
         function openEditModal(quizId) {
-            // ดึงข้อความและช้อยส์ดั้งเดิมจากฐานข้อมูลดิบ เพื่อป้องกันไม่ให้ผู้แก้ไขสับสนเวลาสุ่มช้อยส์อยู่
             const originalItem = rawQuizzes.find(x => x.id === quizId);
             const liveItem = currentQuizData.find(x => x.id === quizId);
             if (!originalItem || !liveItem) return;
@@ -499,9 +656,7 @@ const firebaseConfig = {
             const container = document.getElementById('modalChoicesContainer');
             container.innerHTML = '';
 
-            // ใช้โครงสร้างลำดับช้อยส์ดั้งเดิมเสมอในการอัปเดต
             originalItem.choices.forEach((choice, index) => {
-                // ค้นหาว่า ณ ปัจจุบัน ข้อนี้ถูกเฉลยไว้ที่ดัชนีไหนในเวอร์ชันดิบ
                 const isSelected = index === originalItem.ans; 
                 container.innerHTML += `
                     <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer text-sm font-medium transition-colors">
@@ -541,7 +696,6 @@ const firebaseConfig = {
                 updatedBy: editorNameStr
             };
 
-            // อัปเดตในอาเรย์ข้อมูลต้นฉบับดั้งเดิม (รักษาสิทธิ์ของโครงสร้างดิบ)
             const originIndex = rawQuizzes.findIndex(x => x.id === quizId);
             if (originIndex !== -1) {
                 rawQuizzes[originIndex].ans = newAnsIndex;
@@ -549,7 +703,6 @@ const firebaseConfig = {
             }
 
             if (isFirebaseActive) {
-                // ยิงข้อมูลอัปเดตลงคลาวด์ Firebase แบบเรียลไทม์
                 db.ref(`quizzes/${quizId}`).set(updatePayload)
                     .then(() => {
                         alert("🎉 อัปเดตข้อมูลเฉลยขึ้น Firebase คลาวด์เรียบร้อยแล้ว!");
@@ -559,13 +712,9 @@ const firebaseConfig = {
                         alert("เกิดข้อผิดพลาดในการบันทึกข้อมูลคลาวด์: " + err.message);
                     });
             } else {
-                // ทำงานบนเบราว์เซอร์ชั่วคราวกรณีไม่ได้แปะคีย์ Firebase
                 localCloudUpdates[quizId] = updatePayload;
-                
-                // ซิงค์เข้าสู่โครงสร้างการทำงานหน้าปัจจุบัน
                 const liveItem = currentQuizData.find(x => x.id === quizId);
                 if (liveItem) {
-                    // หากอยู่ในโหมดสุ่ม ต้องประมวลผลคำตอบใหม่ให้ตรงกับช้อยส์ที่สับไปแล้ว
                     if (isRandomized) {
                         const originalItem = rawQuizzes.find(x => x.id === quizId);
                         const correctText = originalItem.choices[newAnsIndex];
