@@ -346,8 +346,10 @@ const firebaseConfig = {
             let listToRender = currentQuizData;
 
             if (currentFilter !== 'all') {
-                listToRender = currentQuizData.filter(item => item.set === currentFilter);
-            }
+        listToRender = currentQuizData.filter(item => item.set === currentFilter);
+    } else {
+        listToRender = currentQuizData; // มั่นใจว่าโหลดครั้งแรกสุดจะแสดงข้อสอบทุกปีออกมารวมกันทันที
+    }
 
             if (listToRender.length === 0) {
                 quizContainer.innerHTML = `<div class="text-center py-12 bg-white rounded-2xl border text-slate-400 font-medium">ไม่พบข้อสอบในชุดนี้</div>`;
