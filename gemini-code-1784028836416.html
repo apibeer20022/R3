@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบคลังข้อสอบรังสีเทคนิค 3 ☢️</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen pb-12">
+
+    <header class="bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-700 text-white shadow-md sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-white/20 p-2.5 rounded-xl backdrop-blur-sm">
+                    <i class="fa-solid fa-radiation text-2xl text-yellow-300 animate-spin-slow"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-wide">คลังข้อสอบรังสีเทคนิค 3 🧠</h1>
+                    <p class="text-xs text-cyan-100 opacity-90 font-light">ระบบจำลองข้อสอบดิจิทัลฉลาดเลือก</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <span class="text-sm font-medium whitespace-nowrap text-cyan-100"><i class="fa-solid fa-folder-open mr-1"></i> ชุดข้อสอบ:</span>
+                <select id="setSelector" class="bg-white/10 text-white border border-white/20 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 w-full sm:w-48 cursor-pointer drop-shadow-sm [&>option]:text-slate-800">
+                    <option value="all">📝 รวมข้อสอบทั้งหมด</option>
+                    <option value="r3-64">📅 ประจำปี 2564</option>
+                    <option value="r3-65">📅 ประจำปี 2565</option>
+                    <option value="r3-66">📅 ประจำปี 2566</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-4xl mx-auto px-4 mt-6">
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-wrap justify-between items-center gap-4">
+            <div class="text-slate-500 text-sm font-medium">
+                <i class="fa-solid fa-circle-info text-blue-500 mr-1"></i> คลิกคำตอบเพื่อตรวจทันที และกดเปลี่ยนข้อยส์ได้ตลอดเวลา 👌
+            </div>
+            <button id="btnRandom" class="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-semibold text-sm px-4 py-2 rounded-xl transition-all shadow-sm hover:shadow active:scale-95">
+                <i class="fa-solid fa-shuffle"></i> สุ่มลำดับข้อสอบและช้อยส์ (Random)
+            </button>
+        </div>
+    </div>
+
+    <main class="max-w-4xl mx-auto px-4 mt-6">
+        <div id="quizContainer" class="space-y-6">
+            </div>
+    </main>
+
+    <div id="editModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-lg overflow-hidden transform scale-95 transition-transform duration-300">
+            <div class="bg-slate-900 text-white p-4 flex justify-between items-center">
+                <h3 class="font-bold flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-cyan-400"></i> แก้ไขเฉลยต้นฉบับ (คลาวด์)</h3>
+                <button onclick="closeEditModal()" class="text-slate-400 hover:text-white transition-colors text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="editForm" class="p-6 space-y-4">
+                <input type="hidden" id="modalTargetId">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">โจทย์คำถามดิบ</label>
+                    <div id="modalQuestionText" class="text-sm bg-slate-50 p-3 rounded-xl border border-slate-200 max-h-24 overflow-y-auto text-slate-600 font-medium"></div>
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">เลือกเฉลยที่ถูกต้องใหม่ (โครงสร้างดิบ)</label>
+                    <div id="modalChoicesContainer" class="space-y-2">
+                        </div>
+                </div>
+
+                <div>
+                    <label for="editorName" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">ชื่อผู้แก้ไข <span class="text-red-500">*</span></label>
+                    <input type="text" id="editorName" required class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="กรุณากรอกชื่อของคุณ...">
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeEditModal()" class="px-4 py-2 border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 text-sm font-semibold transition-colors">ยกเลิก</button>
+                    <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold shadow-sm transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> บันทึกข้อมูล
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+    <script>
+        // --- DATA DEPOSIT ---
+        const rawQuizzes = [
+            // --- 2064 ---
+            {id:"r3-64-q1",set:"r3-64",q:"ปริมาณรังสีที่พิจารณาถึงผลทางชีววิทยาในการปรับเทียบสภาพความไวของรังสีแต่ละเนื้อเยื่อหรืออวัยวะทั่วร่างกาย เรียกว่าอะไร",choices:["Effective dose","Absorbed dose","Exposure","Air kerma","Equivalent dose"],ans:0},
+            {id:"r3-64-q2",set:"r3-64",q:"การตรวจสอบค่า HVL เป็นการตรวจสอบประสิทธิภาพของเครื่องเอกซเรย์ในด้านใด",choices:["คุณภาพลำรังสี","ความแม่นยำ","เวลา","ความเที่ยงตรง","กระแสหลอด"],ans:0},
+            {id:"r3-64-q3",set:"r3-64",q:"ในการถ่ายภาพทางรังสีวินิจฉัย interaction แบบใด ที่ใช้ในการสร้างภาพ",choices:["Compton scattering เท่านั้น","Photoelectric absorption เท่านั้น","Photoelectric absorption และ Compton scattering","Coherent และ Compton scattering","Coherent scattering เท่านั้น"],ans:2},
+            {id:"r3-64-q4",set:"r3-64",q:"ข้อใดเป็นอาการแสดงที่เกิดขึ้นเมื่อผู้ป่วยแพ้สารทึบรังสี (Contrast media) อย่างรุนแรง",choices:["Urticaria","Hypotension","Vomiting","Nausea","Anaphylaxis"],ans:4},
+            {id:"r3-64-q5",set:"r3-64",q:"การขจัดกากกัมมันตรังสีในงานตรวจทางเวชศาสตร์นิวเคลียร์ นิยมใช้วิธีการใด",choices:["Concentration and contain","Concentration and sedimentation","Dilute and disperse","Delay and decay","Concentration and disperse"],ans:3},
+            {id:"r3-64-q6",set:"r3-64",q:"ธาตุกัมมันตรังสีชนิดหนึ่งมีค่าครึ่งชีวิต 5 วัน ในเวลา 20 วัน ธาตุนี้จะสลายตัวไปกี่เปอร์เซ็นต์",choices:["6.25%","87.5%","93.75%","75.0%","12.5%"],ans:2},
+            {id:"r3-64-q7",set:"r3-64",q:"คุณลักษณะที่พึงประสงค์ของเจ้าหน้าที่รังสีเทคนิค ข้อใดที่จะทำให้เข้าใจความรู้สึกของผู้ป่วย",choices:["Flexibility","Belonging","Self-awareness","Empathy","Warm"],ans:3},
+            {id:"r3-64-q8",set:"r3-64",q:"หลักการพื้นฐานของการป้องกันอันตรายจากรังสี 3 ข้อ คือ Justification, Optimization และ Dose limit สำหรับนักรังสีเทคนิค ในการป้องกันอันตรายจากรังสีควรใช้หลักการในข้อใด",choices:["Optimization","Dose limit","Justification และ Optimization","Optimization และ Dose limit","Justification"],ans:3},
+            {id:"r3-64-q9",set:"r3-64",q:"เครื่องมือวัดรังสีประจำตัวบุคคลใดจัดอยู่ในประเภท active monitoring",choices:["OSL badges","Film badges","Electronic pocket dosimeters","Nuclear emulsion or track etch dosimeters","TLD badges"],ans:2},
+            {id:"r3-64-q10",set:"r3-64",q:"การวินิจฉัยความผิดปกติของลำไส้ใหญ่ โดยการสวนแป้ง Barium sulfate ทางทวารหนัก ห้ามทำการตรวจในผู้ป่วยที่มีอาการเช่นไร",choices:["Rectal bleeding","Intestinal perforation","Polyps","Vomiting","Nausea"],ans:1},
+            {id:"r3-64-q11",set:"r3-64",q:"วัตถุประสงค์หลักของการป้องกันอันตรายจากรังสีคืออะไร",choices:["ป้องกันการเกิด Deterministic effects และลดโอกาสเกิด Stochastic effects","ป้องกันการเกิด Deterministic และ Stochastic effects","ป้องกันการเกิด Hereditary effects และลดโอกาสเกิด Somatic effects","ป้องกันการเกิด Stochastic effects และลดโอกาสเกิด Deterministic effects","ป้องกันการเกิด Somatic effects และลดโอกาสเกิด Hereditary effects"],ans:0},
+            {id:"r3-64-q12",set:"r3-64",q:"Hp (0.07) ในรายงานผลบันทึกปริมาณรังสีบุคคล เป็นปริมาณรังสีที่จุดใด",choices:["ปริมาณรังสียังผลที่ผิวไหน","ปริมาณรังสียังผลที่ศีรษะ","ปริมาณรังสียังผลที่เลนส์ตา","ปริมาณรังสียังผลที่มือ","ปริมาณรังสียังผลที่เนื้อเยื่อใต้ผิวหนัง"],ans:0},
+            {id:"r3-64-q13",set:"r3-64",q:"กฎกำลังสองผกผัน หมายความว่า",choices:["เมื่อเราเพิ่มระยะห่างเป็นสองเท่า อัตราปริมาณรังสีลดลงครึ่งหนึ่ง","เมื่อเราเพิ่มระยะห่างเป็นสองเท่า อัตราปริมาณรังสีจะลดลงเหลือหนึ่งในสี่","เมื่อเราเพิ่มระยะห่างเป็นสองเท่า อัตราปริมาณรังสีจะเพิ่มขึ้นครึ่งเท่า","เมื่อเราลดระยะห่างลงครึ่งหนึ่ง อัตราปริมาณรังสีจะเพิ่มขึ้นสองเท่า","เมื่อเราลดระยะห่างลงเป็นหนึ่งในสี่ อัตราปริมาณรังสีเพิ่มเป็นสองเท่า"],ans:1},
+            {id:"r3-64-q14",set:"r3-64",q:"ป้ายเตือนบริเวณรังสี เป็นรูปคล้ายใบพัด ข้อใดถูกต้องที่สุด",choices:["พื้นสีม่วง รูปใบพัดสีดำ","พื้นสีม่วง รูปใบพัดสีเหลือง","พื้นสีเหลือง รูปใบพัดสีม่วง","พื้นสีขาว รูปใบพัดสีดำ","พื้นสีเหลือง รูปใบพัดสีแดง"],ans:2},
+            {id:"r3-64-q15",set:"r3-64",q:"การเรืองแสงแบบ phosphorescence แตกต่างจาก fluorescence คือ",choices:["รูปแบบของพลังงานที่ดูดกลืน","ความสว่าง","ระยะเวลาระหว่างการดูดกลืนพลังงานจนกระทั่งเรืองแสง","ไม่ต่างกัน","สีของแสง"],ans:2},
+            {id:"r3-64-q16",set:"r3-64",q:"ข้อใดกล่าวถูกต้องเกี่ยวการแบ่งโปรแกรมการควบคุมคุณภาพ (Quality control program) ออกเป็นระดับตามความยากง่ายและความซับซ้อนของวิธีการ",choices:["ระดับที่ 1 และ ระดับที่ 2 ถูกต้อง","ระดับที่ 3 การประเมินอย่างซับซ้อนและทำลาย (invasive and complex) โดยและเป็นวิธีที่รบกวนระบบของเครื่องเอกซเรย์ ผู้ที่ทำคือ นักฟิสิกส์หรือวิศวกรที่มีความชำนาญ","ระดับที่ 1, ระดับที่ 2 และ ระดับที่ 3 ถูกต้อง","ระดับที่ 2 การประเมินอย่างซับซ้อนและไม่ทำลาย (noninvasive and complex) เช่นการวัดปริมาณรังสีจากเครื่องเอกซเรย์ ผู้ที่ทำคือนักรังสีเทคนิคที่ผ่านการฝึกอบรมมาโดยเฉพาะ","ระดับที่ 1 การประเมินอย่างง่ายและไม่ทำลาย (noninvasive and simple) เช่นการประเมินค่าเลขซีทีเฉลี่ยของน้ำจากแฟนตอมน้ำ ผู้ที่ทำคือนักรังสีเทคนิค"],ans:2},
+            {id:"r3-64-q17",set:"r3-64",q:"การผลิตเอกซเรย์ที่ใช้ในการถ่ายภาพอวัยวะภายในของผู้ป่วย สามารถทำได้โดยการใช้อะไรยิงใส่เป้า tungsten",choices:["อนุภาคอิเล็กตรอนความเร็วสูง","นิวตรอนความเร็วสูง","ความร้อนสูง","ไฟฟ้าแรงสูง","คลื่นแม่เหล็กไฟฟ้า"],ans:0},
+            {id:"r3-64-q18",set:"r3-64",q:"ข้อใดเป็นผลของรังสีในระยะยาวแบบ Stochastic effects",choices:["ต้อกระจก","ผมร่วง","มะเร็ง","เป็นหมันชั่วคราว","ผิวหนังแดง, ไหม้"],ans:2},
+            {id:"r3-64-q19",set:"r3-64",q:"โปรแกรมการจัดการเชิงคุณภาพ (Quality management program) ประกอบด้วยอะไรบ้าง",choices:["การส่งเสริมคุณภาพอย่างต่อเนื่อง (CQI)","การประกันคุณภาพ (QA) และ การควบคุมคุณภาพ (QC)","การประกันคุณภาพ (QA)","การประกันคุณภาพ (QA), การควบคุมคุณภาพ (QC), การส่งเสริมคุณภาพอย่างต่อเนื่อง (CQI)","การควบคุมคุณภาพ (QC)"],ans:3},
+            {id:"r3-64-q20",set:"r3-64",q:"ธาตุใดต่อไปนี้มีค่าชีวิตเฉลี่ย (Mean lifetime) สูงสุด",choices:["ธาตุซีเซียม-137 มีค่าความแรงรังสีตั้งต้นเท่ากับ 10 คูรี ครึ่งชีวิต 30 วัน","ธาตุแบเรียม-140 มีค่าความแรงรังสีตั้งต้นเท่ากับ 5 คูรี ครึ่งชีวิต 12.5 วัน","ธาตุอิริเดียม-192 มีค่าความแรงรังสีตั้งต้นเท่ากับ 10 เบคเคอเรล ครึ่งชีวิต 73.8 วัน","ธาตุไอโอดีน-131 มีค่าความแรงรังสีตั้งต้นเท่ากับ 5 เบคเคอเรล ครึ่งชีวิต 8.05 วัน","ธาตุทอเรียม-234 มีค่าความแรงรังสีตั้งต้นเท่ากับ 10 คูรี ครึ่งชีวิต 24.1 วัน"],ans:2},
+            {id:"r3-64-q21",set:"r3-64",q:"Interaction ชนิดใดที่ทำให้ Incident photon มีพลังงานลดลงแต่ยังคงอยู่",choices:["Pair production","Photoelectric effect","Coherent scattering","Photodisintegrations","Compton effect"],ans:4},
+            {id:"r3-64-q22",set:"r3-64",q:"พิจารณาอะตอมของไฮโดรเจนของน้ำ ซึ่งวางอยู่ในที่ที่ไม่มีสนามแม่เหล็กจากภายนอกเข้าไปรบกวน ปริมาณในข้อใดต่อไปนี้มีค่าเป็นศูนย์",choices:["Kinetic energy","Atomic mass","Magnetic moment","Magnetization","Mass density"],ans:3},
+            {id:"r3-64-q23",set:"r3-64",q:"สำหรับการเกิด Nuclear magnetic resonance ของนิวเคลียสไฮโดรเจน จะมีพลังงานที่นิวเคลียสของไฮโดรเจนคายออกมา พลังงานดังกล่าวนั้นจัดอยู่ในพวกใด",choices:["Microwave","Radio-frequency wave","Ultrasound","Infrared","X-ray photon"],ans:1},
+            {id:"r3-64-q24",set:"r3-64",q:"Specific activity หมายถึงข้อใด",choices:["ความบริสุทธิ์ของสารกัมมันตรังสี","ความเข้มข้นสารกัมมันตรังสีต่อมวลของสารกัมมันตรังสี","มวลของสารกัมมันตรังสี","ความแรงรังสีสารกัมมันตรังสีต่อมวลของสารกัมมันตรังสี","ปริมาณของสารกัมมันตรังสีต่อมวลของสารกัมมันตรังสี"],ans:3},
+            {id:"r3-64-q25",set:"r3-64",q:"ข้อใด ไม่ใช่ ระบบสารสนเทศ (information system) ซึ่งสนับสนุนกระบวนการทำงานในหน่วยงานรังสีวิทยา",choices:["Imaging report","Patient registration","Enterprise resource planning","Picture archiving and communication system","Appointment and scheduling"],ans:2},
+            {id:"r3-64-q26",set:"r3-64",q:"หากตั้งค่า Exposure ที่ 110 kVp และผลของการอ่านค่าด้วยเครื่องตรวจสอบ kVp คือ 110 kVp เท่ากันทั้ง 10 ครั้ง แสดงว่าเครื่องเอกซเรย์ดังกล่าวมีการให้ค่า kVp ที่ 110 kVp เป็นอย่างไร",choices:["มี Accuracy ที่ดี","Precision ที่ดี","มี Accuracy และ Precision ที่ดี","ต้องตรวจสอบเทียบค่า mAs","สรุปไม่ได้"],ans:2},
+            {id:"r3-64-q27",set:"r3-64",q:"เพราะเหตุใด ผู้ป่วยที่ได้รับบาดเจ็บบริเวณศีรษะ จึงต้องได้รับการระมัดระวังมากที่สุด",choices:["การแตกหักของกระดูกศีรษะ","การบาดเจ็บของกระดูกสันหลังส่วนคอ","การหยุดหายใจ","การบาดเจ็บบริเวณใบหน้า","การหมดสติ"],ans:1},
+            {id:"r3-64-q28",set:"r3-64",q:"กรณีที่ผู้ป่วยหัวใจหยุดเต้นหรือหยุดหายใจ การทำปฏิบัติการคืนชีพขั้นพื้นฐาน ตามหลัก A-B-C แต่ละตัวหมายถึงข้อใด",choices:["A: Airway, B: Breathing, C: Circulation","A: Arrive, B: Breathing, C: Cardio","A: Arrive, B: Breathing, C: Circulation","A: Aerobic, B: Breathing, C: Cardio","A: Airway, B: Breathing, C: Cardio"],ans:0},
+            {id:"r3-64-q29",set:"r3-64",q:"ข้อใดถูกต้องเกี่ยวกับรูปแบบการควบคุณภาพ (Type of quality control)",choices:["Acceptance testing การตรวจสอบหรือการประเมินเพื่อการยอมรับสำหรับเครื่องมือหรืออุปกรณ์ใหม่","Routine performance evaluation เป็นการประเมินเครื่องมืออย่างสม่ำเสมอตามช่วงเวลา","Error correction test เป็นการทดสอบเพื่อแก้ไขข้อบกพร่อง","ถูกทุกข้อ","ไม่มีข้อใดถูก"],ans:3},
+            {id:"r3-64-q30",set:"r3-64",q:"สเปกตรัมของรังสีเอกซ์ชนิดใดเป็นแบบต่อเนื่อง (Continuous spectrum)",choices:["Pair production","Compton scattering","Bremsstrahlung radiation","Characteristic radiation","Coherent scattering"],ans:2},
+            {id:"r3-64-q31",set:"r3-64",q:"การตรวจสอบในข้อใดเป็นการวัดความเที่ยงตรงของปริมาณรังสีเอกซ์ที่ออกจากหลอดเอกซเรย์",choices:["X-ray output reproducibility","X-ray output linearity","X-ray output reciprocity","X-ray output accuracy","Timer accuracy"],ans:0},
+            {id:"r3-64-q32",set:"r3-64",q:"เครื่อง PET ใช้ประโยชน์ของการเกิดปรากฏการณ์ในข้อใด",choices:["Annihilation","Compton effect","Coherent scattering","Photodisintegrations","Photoelectric effect"],ans:0},
+            {id:"r3-64-q33",set:"r3-64",q:"การสอบเทียบเครื่องวัดรังสี ควรเลือกห้องปฏิบัติการที่ได้รับการรับรองมาตรฐานคุณภาพใด",choices:["ISO 9000","HA","ISO Guide 43","ISO/IEC 17025","สมอ. และ มอก."],ans:3},
+            {id:"r3-64-q34",set:"r3-64",q:"Electron และ positron มารวมตัวกันจะเกิดปรากฏการณ์ ตามตัวเลือกข้อใด",choices:["Electron capture","Auger effect","Isomeric transition","Annihilation radiation","Internal conversion"],ans:3},
+            {id:"r3-64-q35",set:"r3-64",q:"เมื่อนำหลัก SWOT มาวิเคราะห์องค์กรหรือหน่วยงานโรงพยาบาล ข้อใดถูกต้อง",choices:["จุดแข็ง (Strengths) และจุดอ่อน (Weakness) จัดเป็นปัจจัยภายนอก","โอกาส (Opportunities) และข้อจำกัด (Threat) จัดเป็นปัจจัยภายใน","จุดแข็ง (Strengths) และโอกาส (Opportunities) จัดเป็นปัจจัยภายใน","จุดแข็ง (Strengths) และจุดอ่อน (Weakness) จัดเป็นปัจจัยภายใน","จุดแข็ง (Strengths) และโอกาส (Opportunities) จัดเป็นปัจจัยภายนอก"],ans:3},
+            {id:"r3-64-q36",set:"r3-64",q:"นิวเคลียสของอะตอมทุกตัว ประกอบด้วยอะไรบ้าง",choices:["Electron","Neutron","Proton","Photon","Positron"],ans:2},
+            {id:"r3-64-q37",set:"r3-64",q:"Focusing cup คืออะไร",choices:["อุปกรณ์ควบคุมลำอิเล็กตรอนด้านแคโทด","อุปกรณ์ควบคุมลำอิเล็กตรอนด้านแอโนด","อุปกรณ์ควบคุมลำ x-ray ด้านแคโทด","อุปกรณ์ควบคุมลำ x-ray ด้านแอโนด","ไม่มีข้อใดถูก"],ans:0},
+            {id:"r3-64-q38",set:"r3-64",q:"ปริมาณรังสีชนิดใดที่ต้องพิจารณาผลทางชีววิทยาจากความรุนแรงของรังสีแต่ละชนิด",choices:["Equivalent dose","Air kerma","Effective dose","Absorbed dose","Exposure"],ans:0},
+            {id:"r3-64-q39",set:"r3-64",q:"Radiation output ของหลอดเอกซเรย์เป็นสัดส่วนอย่างไรกับ mAs",choices:["แปรผันตรงกับ mAs","แปรผันตรงกับกำลังสองของ mAs","แปรผกผันกับ mAs","แปรผกผันกับกำลังสองของ mAs","ไม่มีข้อใดถูก"],ans:0},
+            {id:"r3-64-q40",set:"r3-64",q:"ข้อใดคือ SI unit ของ Absorbed dose",choices:["rad","Gy","Sv","rem","R"],ans:1},
+            {id:"r3-64-q41",set:"r3-64",q:"อาการเจ็บป่วยซึ่งนำไปสู่การเสียชีวิต (acute effect) จากการได้รับรังสีปริมาณสูง แบ่งเป็น 3 กลุ่มหลักๆ ได้แก่ข้อใด",choices:["Gastrointestinal system, excretory system, hematopoietic system","Hematopoietic system, respiratory system, cerebrovascular system","Hematopoietic system, gastrointestinal system, cerebrovascular system","Cerebrovascular system, integumentary system, gastrointestinal system","Immune system, reproductive system, cerebrovascular system"],ans:2},
+            {id:"r3-64-q42",set:"r3-64",q:"การนำหลัก ALARA มาใช้ในการปฏิบัติงานทางรังสีเทคนิคนั้น จะต้องคำนึงถึงปัจจัยที่เกี่ยวข้องด้านใดบ้าง",choices:["ปริมาณรังสีที่ผู้ปฏิบัติงานได้รับ","ปัจจัยทางสังคมและเศรษฐกิจ","ปัจจัยทางด้านการเมืองและกฎหมาย","ปริมาณรังสีที่ผู้รับการบริการได้รับ","ถูกทุกข้อ"],ans:4},
+            {id:"r3-64-q43",set:"r3-64",q:"2P Safety Goals หมายถึงข้อใดต่อไปนี้",choices:["Policy safety & People safety","Patient safety & Personal safety","Patient safety & Polite safety","Policy safety & Politic safety","People safety & Process safety"],ans:1},
+            {id:"r3-64-q44",set:"r3-64",q:"Electromagnetic radiation ต่อไปนี้ ชนิดใดมีความยาวคลื่นสั้นที่สุด",choices:["X-rays","Ultraviolet waves","Visible light","Infrared waves","Radio waves"],ans:0},
+            {id:"r3-64-q45",set:"r3-64",q:"Interaction ชนิดใดที่ทำให้เกิด Positron",choices:["Coherent scattering","Photodisintegrations","Photoelectric effect","Compton effect","Pair production"],ans:4},
+            {id:"r3-64-q46",set:"r3-64",q:"ถ้ามนุษย์ได้รับปริมาณรังสีทั่วร่างกายเท่ากันปริมาณหนึ่ง อวัยวะใดต่อไปนี้มีโอกาสได้รับ radiation effect สูงที่สุด",choices:["Thyroid","Brain","Breast","Gonads","Skin"],ans:3},
+            {id:"r3-64-q47",set:"r3-64",q:"อะตอม Tungsten มีระดับพลังงานที่ 1, 2 และ 3 เท่ากับ 70 keV, 12.0 keV และ 2.8 keV ตามลำดับ ถ้าอิเล็กตรอนของอะตอม Tungsten กระโดดจากระดับพลังงานที่ 3 สู่ระดับพลังงานที่ 1 พลังงานต่ำสุดที่มีโอกาสคายออกมามีค่าเท่าไร",choices:["58.0 eV","67.2 eV","2.8 eV","9.2 eV","12.0 eV"],ans:1},
+            {id:"r3-64-q48",set:"r3-64",q:"ผู้ป่วยที่มีภาวะ hypoglycemia ควรได้รับการรักษาอย่างไร",choices:["ให้ 50% glucose","ให้ Oxygen mask","นวดปั๊มหัวใจ","ให้ 5% NaCl Solution","ให้ morphine"],ans:0},
+            {id:"r3-64-q49",set:"r3-64",q:"ค่าการทำงานของไตที่แสดงถึงภาวะความเสี่ยงต่ำของการเกิด Contrast Induced Nephropathy (CIN) จากการฉีดสารทึบรังสีเข้าสู่หลอดเลือดดำคือข้อใด",choices:["GFR มากกว่า 60 mL/min/1.73 m²","GFR 50 mL/min/1.73 m²","GFR ต่ำกว่า 30 mL/min/1.73 m²","GFR 40 mL/min/1.73 m","ไม่มีข้อถูก"],ans:0},
+
+            // --- 2065 ---
+            {id:"r3-65-q1",set:"r3-65",q:"การออกแบบห้องปฏิบัติการ เช่น ห้องเอกซเรย์ สำหรับผู้ปฏิบัติงานควรจะมีระดับปริมาณรังสีเท่าใด",choices:["ไม่เกิน 1 มิลลิซีเวิร์ดต่อสัปดาห์","ไม่เกิน 0.1 มิลลิซีเวิร์ดต่อสัปดาห์","ไม่เกิน 0.02 มิลลิซีเวิร์ดต่อสัปดาห์","ไม่เกิน 10 มิลลิซีเวิร์ดต่อสัปดาห์","เกิน 0.1 ซีเวิร์ดต่อสัปดาห์"],ans:1},
+            {id:"r3-65-q2",set:"r3-65",q:"ตามเกณฑ์แนะนำของ ICRP สำหรับผู้ปฏิบัติงานทางรังสี ปริมาณรังสีสมมูล (Equivalent dose) ที่เลนส์ตา ต้องไม่เกินเท่าใดใน 1 ปี",choices:["15 mSv","20 mSv","50 mSv","150 mSv","500 mSv"],ans:1},
+            {id:"r3-65-q3",set:"r3-65",q:"อนุภาคแอลฟาประกอบด้วยอะไรบ้าง",choices:["โปรตอน 2 ตัว นิวตรอน 2 ตัว","โปรตอน 1 ตัว นิวตรอน 1 ตัว","โปรตอน 4 ตัว นิวตรอน 2 ตัว","โปรตอน 1 ตัว นิวตรอน 2 ตัว","โปรตอน 2 ตัว นิวตรอน 1 ตัว"],ans:0},
+            {id:"r3-65-q4",set:"r3-65",q:"การตรวจสอบค่า HVL เป็นการตรวจสอบประสิทธิภาพของเครื่องเอกซเรย์ในด้านใด",choices:["Beam quality (คุณภาพลำรังสี)","kVp accuracy (ความแม่นยำของ kVp)","mAs linearity (ความเที่ยงตรงของ mAs)","Spatial resolution (ความแยกชัดเชิงพื้นที่)","Reproducibility (ความสามารถในการทำซ้ำ)"],ans:0},
+            {id:"r3-65-q5",set:"r3-65",q:"รังสีที่ก่อให้เกิดผลกระทบต่อเซลล์แบบโดยตรง (Direct effect) เป็นกระบวนการหลัก (Dominant process) คือข้อใด",choices:["Neutron และ Alpha particle","X-ray และ Gamma ray","Neutron และ X-ray","Alpha particle และ X-ray","Gamma ray และ Neutron"],ans:0},
+            {id:"r3-65-q6",set:"r3-65",q:"ข้อใดคือผลกระทบของรังสีต่อสิ่งมีชีวิตแบบ Stochastic effect",choices:["ผมร่วง","โรคมะเร็ง","ต้อกระจก","ผิวหนังแดง","อุจจาระร่วง"],ans:1},
+            {id:"r3-65-q7",set:"r3-65",q:"ข้อใดเป็นอันตรกิริยาหลักที่เกิดขึ้นในการถ่ายภาพเอกซเรย์กระดูกต้นขาที่ 40kVp",choices:["Compton Scattering","Photoelectric Absorption","Coherent Scattering","Pair Production","Annihilation"],ans:1},
+            {id:"r3-65-q8",set:"r3-65",q:"ข้อใด ไม่ใช่ อันตรกิริยาระหว่างโฟตอนกับตัวกลาง",choices:["Photoelectric effect","Inelastic scattering","Compton scattering","Rayleigh scattering","Photodisintegration"],ans:1},
+            {id:"r3-65-q9",set:"r3-65",q:"ข้อใดมีอัตราการติดเชื้อจากการปฏิบัติงานในโรงพยาบาลสูงที่สุด",choices:["Human Immunodeficiency Virus (HIV)","AIDS","Tuberculosis","Hepatitis B","Measles"],ans:3},
+            {id:"r3-65-q10",set:"r3-65",q:"เพราะเหตุใดเป้าโลหะของหลอดเอกซเรย์จึงต้องเอียงทำมุมกับแนวดิ่ง",choices:["เพิ่มจำนวนของรังสีเอกซ์","เพิ่มพลังงานรังสีเอกซ์","ลดการเกิด Off focus radiation","เพิ่มการระบายความร้อน","ลดขนาด Effective focal spot"],ans:4},
+            {id:"r3-65-q11",set:"r3-65",q:"ผลทางชีววิทยาสัมพันธ์ (Relative biological effectiveness; RBE) คือข้อใด",choices:["อัตราส่วนระหว่างปริมาณรังสีของรังสีอ้างอิงต่อปริมาณรังสีของรังสีที่ต้องการทราบค่า RBE โดยที่ปริมาณรังสีทั้งสองนี้จะทำให้เกิดผลทางชีววิทยาแตกต่างกัน","อัตราส่วนระหว่างผลทางชีววิทยาของรังสีที่ต้องการทราบค่า RBE ต่อผลทางชีววิทยาของรังสีอ้างอิง โดยที่ปริมาณรังสีทั้งสองนี้เท่ากัน","อัตราส่วนระหว่างผลทางชีววิทยาของรังสีอ้างอิงต่อผลทางชีววิทยาของรังสีที่ต้องการทราบค่า RBE โดยที่ปริมาณรังสีทั้งสองนี้เท่ากัน","อัตราส่วนระหว่างปริมาณรังสีของรังสีที่ต้องการทราบค่า RBE ต่อปริมาณรังสีของรังสีอ้างอิง โดยที่ปริมาณรังสีทั้งสองนี้จะทำให้เกิดผลทางชีววิทยาเดียวกัน","อัตราส่วนระหว่างปริมาณรังสีของรังสีอ้างอิงต่อปริมาณรังสีของรังสีที่ต้องการทราบค่า RBE โดยที่ปริมาณรังสีทั้งสองนี้จะทำให้เกิดผลทางชีววิทยาเดียวกัน"],ans:4},
+            {id:"r3-65-q12",set:"r3-65",q:"วัฏจักรเซลล์ (Cell cycle) ในระยะใดมีความไวต่อรังสีมากที่สุด",choices:["G2/M phase","Late S phase","G0/G1 phase","Sub G0 phase","Early S phase"],ans:0},
+            {id:"r3-65-q13",set:"r3-65",q:"แบบจำลองอะตอมช่วยแสดงให้เห็นว่าปริมาตรส่วนใหญ่ของอะตอมคือข้อใด",choices:["นิวตรอน","โปรตอน","นิวเคลียส","อิเล็กตรอน","ที่ว่าง"],ans:4},
+            {id:"r3-65-q14",set:"r3-65",q:"อันตรกิริยาใดทำให้ Incident photon เปลี่ยนไปเฉพาะทิศทางการเคลื่อนที่เท่านั้น",choices:["Coherent scattering","Photoelectric effect","Pair production","Photodisintegration","Compton effect"],ans:0},
+            {id:"r3-65-q15",set:"r3-65",q:"ต้องใช้เวลาเป็นกี่เท่าของค่าครึ่งชีวิตเพื่อให้สารกัมมันตรังสีสลายตัวเหลือน้อยกว่า 10% ของสารกัมมันตรังสีเริ่มต้น",choices:["1 เท่า","2.5 เท่า","3.4 เท่า","4.3 เท่า","5.2 เท่า"],ans:2},
+            {id:"r3-65-q16",set:"r3-65",q:"ข้อใดเรียงลำดับการถ่ายเทพลังงานเชิงเส้น (Linear energy transfer; LET) จากมากไปน้อยได้ถูกต้อง",choices:["แอลฟา -> โปรตอน -> แกมมา","คาร์บอน -> นีออน -> แอลฟา","แกมมา -> โปรตอน -> แอลฟา","แอลฟา -> คาร์บอน -> นีออน","นีออน -> คาร์บอน -> แอลฟา -> โปรตอน -> แกมมา"],ans:4},
+            {id:"r3-65-q17",set:"r3-65",q:"ค่าใดที่ถูกนำมาใช้ในการคำนวณค่า CT number",choices:["X-ray absorption coefficient","Proton density","Linear energy transfer","Linear attenuation coefficient","Photon energy"],ans:3},
+            {id:"r3-65-q18",set:"r3-65",q:"ข้อใด ไม่ใช่ ข้อกำหนดของมาตรฐานห้องปฏิบัติการทางรังสีวิทยา",choices:["สิ่งแวดล้อมภายในแผนกรังสีวิทยาสะอาด ปลอดโปร่ง","มีพื้นที่รับบริการผู้เข้ารับบริการอย่างเพียงพอ","มีการติดตั้งถังดับเพลิงที่เหมาะสม พร้อมใช้งาน และมีการตรวจสอบอย่างสม่ำเสมอ","มีบัญชีรายชื่อเครื่องมือในแผนกรังสีวิทยา แสดงข้อมูลที่สำคัญ","ห้องอ่านผลของรังสีแพทย์ อยู่ภายในบริเวณห้องถ่ายภาพรังสี"],ans:4},
+            {id:"r3-65-q19",set:"r3-65",q:"ข้อใดถูกต้องเกี่ยวกับภาวะฉุกเฉินทางรังสี",choices:["ภาวะฉุกเฉินทางรังสีระดับ 3 สถานการณ์ขยายขอบเขตออกไปทั่วอาณาบริเวณของประเทศที่เกิดอุบัติเหตุทางรังสี","ภาวะฉุกเฉินทางรังสีระดับ 2 สถานการณ์ขยายขอบเขตออกไป ณ อาณาบริเวณของโรงงาน สถาบันการศึกษาวิจัย หรือโรงพยาบาลที่เกิดอุบัติเหตุทางรังสี","ภาวะฉุกเฉินทางรังสีระดับ 4 สถานการณ์อาจมีผลกระทบต่อภูมิภาคข้างเคียง","ภาวะฉุกเฉินทางรังสีระดับ 1 สถานการณ์มีขอบเขตอยู่ภายในห้องปฏิบัติการหรือภายในอาคาร","ภาวะฉุกเฉินทางรังสีระดับ 3 สถานการณ์อาจมีผลกระทบต่อสถานที่ข้างเคียง"],ans:3},
+            {id:"r3-65-q20",set:"r3-65",q:"การใช้งาน OSL ในข้อใดต่อไปนี้เหมาะสมที่สุด",choices:["ติด OSL ไว้ที่กระเป๋าเสื้อบริเวณหน้าอก โดยหันด้านที่มี Filter เข้าด้านใน","เก็บ OSL หลังปฏิบัติงาน ไว้ในตู้เก็บอุปกรณ์ในห้องเอกซเรย์","ติด OSL ด้านนอกเสื้อตะกั่วขณะทำ Fluoroscopy","ใช้ OSL ประเภท Extremity dosimeter เพื่อวัดรังสีเฉพาะที่บริเวณนิ้วมือ","ถอดการ์ด OSL ตากแดด เพื่อลดความชื้น"],ans:3},
+            {id:"r3-65-q21",set:"r3-65",q:"นิวไคลด์ที่มีเลขมวลเท่ากัน แต่มีเลขอะตอมไม่เท่ากัน สอดคล้องกับตัวเลือกใด",choices:["Isobar","Isomer","Radioisotope","Isotone","Isotope"],ans:0},
+            {id:"r3-65-q22",set:"r3-65",q:"การแนะนำผู้ป่วยที่เข้ารับการตรวจ Bone scan ที่ถูกต้องคือข้อใด",choices:["ผู้ป่วยที่ตรวจ Lung scan สามารถเข้าตรวจ Bone scan ต่อได้ทันที เนื่องจากใช้สารกัมมันตรังสีเดียวกัน","ผู้ป่วยควรดื่มน้ำมากๆ และปัสสาวะบ่อยๆ ระหว่างรอเข้ารับการสแกน","ผู้ป่วยควรงดน้ำและอาหารก่อนตรวจ Bone scan 4-6 ชั่วโมง","หญิงให้นมบุตร สามารถให้นมบุตรได้ทันทีภายหลังการสแกนเสร็จ","ผู้ป่วยหญิงตั้งครรภ์สามารถเข้ารับการตรวจได้ตามปกติ"],ans:1},
+            {id:"r3-65-q23",set:"r3-65",q:"ข้อใดเป็นอาการแสดงที่เกิดขึ้นเมื่อผู้ป่วยแพ้สารทึบรังสี (Contrast media) อย่างรุนแรง",choices:["Hypotension","Nausea","Urticaria","Anaphylaxis","Vomiting"],ans:3},
+            {id:"r3-65-q24",set:"r3-65",q:"รังสีชนิดใดมีคุณสมบัติของ Bragg peak",choices:["Neutron","Electron","Proton","X-ray","Gamma"],ans:2},
+            {id:"r3-65-q25",set:"r3-65",q:"ผู้ป่วยรายหนึ่งได้รับปริมาณรังสีดูดกลืน 2 มิลลิเกรย์ จากรังสีแอลฟาและรังสีเอกซ์ (อย่างละ 1 มิลลิเกรย์) อยากทราบว่าผู้ป่วยรายนี้ได้รับปริมาณรังสีสมมูลทั่วร่างกายเท่าใด",choices:["22 มิลลิซีเวิร์ด","2 มิลลิซีเวิร์ด","12 มิลลิซีเวิร์ด","32 มิลลิซีเวิร์ด","42 มิลลิซีเวิร์ด"],ans:0},
+            {id:"r3-65-q26",set:"r3-65",q:"ข้อใดอธิบาย ผิด เกี่ยวกับภาวะช็อค (Shock)",choices:["เนื้อเยื่อต่างๆ ของร่างกายได้รับเลือดไปเลี้ยงไม่เพียงพอ","ไม่สามารถควบคุมการทำงานของหลอดเลือดได้","ออกซิเจนไปเลี้ยงอวัยวะต่าง ๆ ไม่เพียงพอ","สูญเสียการทำงานของระบบประสาท","เกิดจากการทำงานที่ผิดปกติของเซลล์ประสาทพร้อมกันอย่างกะทันหัน"],ans:4},
+            {id:"r3-65-q27",set:"r3-65",q:"รังสีเอกซ์ที่เกิดจากการที่อิเล็กตรอนพลังงานสูงถูกหน่วง ทำให้เลิกตรอนวิ่งช้าลงหรือหยุดวิ่ง เรียกว่าอะไร",choices:["Internal conversion","Electron capture","Auger electron","Characteristic radiation","Bremsstrahlung radiation"],ans:4},
+            {id:"r3-65-q28",set:"r3-65",q:"หน่วยงานใดมีหน้าที่ควบคุมคุณภาพเครื่องเอกซเรย์ในประเทศไทย",choices:["สำนักงานปรมาณูเพื่อสันติ","กรมวิทยาศาสตร์การแพทย์","กระทรวงการอุดมศึกษา วิทยาศาสตร์ วิจัยและนวัตกรรม","สถาบันเทคโนโลยีนิวเคลียร์แห่งชาติ","กรมการแพทย์"],ans:1},
+            {id:"r3-65-q29",set:"r3-65",q:"ข้อใดคือเครื่องมือในการควบคุมคุณภาพ Display monitor",choices:["SMPTE test pattern","High contrast test object","Grid alignment test tool","ถูกทุกข้อ","Star test pattern"],ans:0},
+            {id:"r3-65-q30",set:"r3-65",q:"พลังงานในช่วงรังสีวินิจฉัยไม่ทำให้เกิดอันตรกิริยาในข้อใด",choices:["Coherent scattering","Compton effect","Pair production","Thomson scattering","Photoelectric effect"],ans:2},
+            {id:"r3-65-q31",set:"r3-65",q:"การวินิจฉัยความผิดปกติของลำไส้ใหญ่ โดยการสวนแป้ง Barium sulfate ทางทวารหนัก ห้ามทำการตรวจในผู้ป่วยที่มีอาการตามข้อใด",choices:["Rectal bleeding","Polyps","Intestinal perforation (ลำไส้ทะลุ)","Vomiting","Nausea"],ans:2},
+            {id:"r3-65-q32",set:"r3-65",q:"ข้อมูลทางสถิติใด ไม่ใช่ ตัวชี้วัดคุณภาพการให้บริการทางรังสีวินิจฉัย",choices:["จำนวนผู้ป่วยที่เข้ารับบริการ","ระยะเวลาที่ใช้ระหว่างรับบริการ","ระยะเวลาการรอคอยก่อนการเข้ารับบริการ","อัตราการถ่ายภาพรังสีซ้ำ (Repeat rate)","อุบัติการณ์ความผิดพลาดจากการปฏิบัติงาน"],ans:0},
+            {id:"r3-65-q33",set:"r3-65",q:"ในการถ่ายภาพเอกซเรย์ช่องท้องที่ 100 kVp และ 20 mAs ด้วยเครื่องเอกซเรย์แบบ High frequency generator รังสีเอกซ์ที่ได้จะมีค่าพลังงานสูงสุดเท่าใด",choices:["20 keV","50 keV","100 keV","200 keV","33.3 keV"],ans:2},
+            {id:"r3-65-q34",set:"r3-65",q:"ถ้ามีการเปรอะเปื้อนรังสีบนผิวหนัง วิธีการที่ดีที่สุดในการชำระล้างคือข้อใด",choices:["ขัดและถูบริเวณนั้นด้วยน้ำปกติแล้วใช้น้ำยาทำความสะอาดทั่วไป","ขัดบริเวณนั้นด้วยแปรงขัดอย่างดี","ล้างบริเวณนั้นด้วยน้ำปกติ แล้วใช้น้ำยาทำความสะอาดทั่วไปอย่างเบามือ","ถูอย่างแรงบริเวณนั้นด้วยน้ำยาทำความสะอาดทั่วไป","ล้างบริเวณนั้นด้วยน้ำร้อนทันที"],ans:2},
+            {id:"r3-65-q35",set:"r3-65",q:"ข้อใด ไม่ใช่ ระบบสารสนเทศ (Information system) ซึ่งสนับสนุนกระบวนการทำงานในหน่วยงานรังสีวิทยา",choices:["Enterprise resource planning (ERP)","Imaging report","Picture archiving and communication system (PACS)","Patient registration","Appointment and scheduling"],ans:0},
+            {id:"r3-65-q36",set:"r3-65",q:"I-131 มีกัมมันตภาพรังสีตั้งต้น 1 mCi มีค่าครึ่งชีวิต 8 วัน ปล่อยให้สลายตัวนาน 32 วัน I-131 จะมีกัมมันตภาพรังสีเหลืออยู่เท่าใด",choices:["0.06 mCi","0.25 mCi","0.75 mCi","0.50 mCi","0.16 mCi"],ans:0},
+            {id:"r3-65-q37",set:"r3-65",q:"Hp (0.07) ในรายงานผลบันทึกปริมาณรังสีบุคคล เป็นปริมาณรังสีที่ตำแหน่งใด",choices:["ปริมาณรังสียังผลที่เลนส์ตา","ปริมาณรังสียังผลที่เต้านม","ปริมาณรังสียังผลที่ศีรษะ","ปริมาณรังสียังผลที่ผิวหนัง","ปริมาณรังสียังผลที่ต่อมไทรอยด์"],ans:3},
+            {id:"r3-65-q38",set:"r3-65",q:"หากพบปัญหาในภาพถ่ายรังสี อุปกรณ์ หรือเครื่องเอกซเรย์ สิ่งใดที่นักรังสีเทคนิคควรปฏิบัติเป็นลำดับแรก",choices:["หาสาเหตุทันที และแก้ไขเบื้องต้นตามคู่มือ","ปิดแผนกงดรับผู้ป่วย","แจ้งผู้บังคับบัญชาสูงสุด","ไม่ต้องทำอะไรรอให้เกิดมากกว่า 3 ครั้ง จึงแจ้งช่างของบริษัท","แจ้งช่างซ่อมบำรุงของโรงพยาบาลหรือหน่วยงานนั้น"],ans:0},
+            {id:"r3-65-q39",set:"r3-65",q:"ข้อใด ไม่ใช่ วัตถุประสงค์หลักของการทำ Repeat analysis",choices:["ลดความเสี่ยงจากการได้รับรังสีโดยไม่จำเป็นในผู้ป่วย","ประเมินประสิทธิภาพการควบคุมคุณภาพในหน่วยงาน","เพิ่มประสิทธิภาพการทำงานของนักรังสีเทคนิค","ป้องกันการเกิดข้อผิดพลาดในระบบงานไม่ให้เกิดซ้ำ","ลดภาระงานของรังสีแพทย์และนักรังสีเทคนิค"],ans:4},
+            {id:"r3-65-q40",set:"r3-65",q:"ปรากฏการณ์ Thermionic emission เกิดขึ้นที่ส่วนประกอบใดของหลอดเอกซเรย์",choices:["Collimator","Filament","Rotor","Anode","Focal spot"],ans:1},
+            {id:"r3-65-q41",set:"r3-65",q:"จากการตรวจสอบระบบการตั้งเวลาในการถ่ายภาพเอกซเรย์พบว่า ค่าที่วัดได้ทุกครั้งมีค่าใกล้เคียงกัน แต่ไม่ตรงกับค่าที่ตั้งไว้ แสดงว่าเครื่องเอกซเรย์นี้เป็นอย่างไร",choices:["Linearity ดี","Accuracy ดี","Accuracy และ Precision ไม่ดี","Precision ดี แต่ Accuracy ไม่ดี","Reciprocity ไม่ดี"],ans:3},
+            {id:"r3-65-q42",set:"r3-65",q:"การปฐมพยาบาลและการรักษาผู้ป่วยฉุกเฉินเบื้องต้นก่อนถึงโรงพยาบาล ต้องประเมินระบบใดบ้าง",choices:["การป้องกันกระดูกสันหลังกดทับ Spinal cord","การห้ามเลือดที่ออกภายนอก","ถูกทุกข้อ","การหายใจ","หัวใจและการไหลเวียนเลือด"],ans:2},
+            {id:"r3-65-q43",set:"r3-65",q:"ข้อใดบอกถึงความแตกต่างระหว่างการเรืองแสงแบบ Phosphorescence และ Fluorescence ได้ชัดเจนที่สุด",choices:["รูปแบบของพลังงานที่ดูดกลืน","สีของแสงเรือง","ระยะเวลาระหว่างการดูดกลืนพลังงานจนกระทั่งเรืองแสง","ความสว่างของแสงเรือง","ความยาวคลื่นของแสงเรือง"],ans:2},
+            {id:"r3-65-q44",set:"r3-65",q:"ผู้ป่วยมะเร็งเต้านมที่เข้ารับการฉายรังสีหลังผ่าตัด ควรปฏิบัติตัวภายหลังจบการรักษาอย่างไร",choices:["ออกกำลังใช้งานแขนข้างที่ฉายรังสีอย่างหนักเพื่อเพิ่มความแข็งแรงของแขน","หมั่นบริหารข้อไหล่ข้างที่รักษาเพื่อป้องกันข้อไหล่ติด","หลีกเลี่ยงการทาครีมบริเวณที่ได้รับรังสีเพื่อป้องกันผิวหนังไหม้","ขัดถูบริเวณที่ฉายรังสีเพื่อผลัดเปลี่ยนเซลล์ผิวหนังที่ได้รับรังสีให้หลุดออกไป","สวมเสื้อผ้าที่รัดรูปเพื่อให้หน้าอกกระชับเข้ารูป"],ans:1},
+            {id:"r3-65-q45",set:"r3-65",q:"วัสดุใดที่มีความเหมาะสมในการกำบังรังสีนิวตรอนมากที่สุด",choices:["พลาสติก/พาราฟิน (วัสดุที่มีไฮโดรเจนสูง)","สังกะสี","คอนกรีตหนา","ตะกั่ว","เหล็ก"],ans:0},
+            {id:"r3-65-q46",set:"r3-65",q:"เพราะเหตุใดความเข้มของรังสีเอกซ์ทางขั้วแอโนดจึงน้อยกว่าขั้วแคโทดของหลอดเอกซเรย์",choices:["Line focus principle","Target material","Focusing cup","Heel effect","Off focus radiation"],ans:3},
+            {id:"r3-65-q47",set:"r3-65",q:"ข้อใดเรียงลำดับระยะการเกิดผลของรังสีแบบเฉียบพลัน (Acute radiation syndrome) ได้ถูกต้อง",choices:["Latent period -> Manifest illness -> Prodromal syndrome -> Recovery or death","Prodromal syndrome -> Latent period -> Manifest illness -> Recovery or death","Manifest illness -> Latent period -> Prodromal syndrome -> Recovery or death","Prodromal syndrome -> Manifest illness -> Latent period -> Recovery or death","Latent period -> Prodromal syndrome -> Manifest illness -> Recovery or death"],ans:1},
+            {id:"r3-65-q48",set:"r3-65",q:"รังสีชนิดใดมีอำนาจทะลุทะลวงสูงที่สุด",choices:["รังสีแกมมา","รังสีแอลฟา","รังสีเอกซ์","รังสีเบตา","รังสีคอสมิก"],ans:0},
+            {id:"r3-65-q49",set:"r3-65",q:"นักรังสีเทคนิคที่ได้รับใบประกอบโรคศิลปะสาขารังสีเทคนิค สามารถเป็นเจ้าหน้าที่ความปลอดภัยทางรังสี (RSO) ในระดับและประเภทใด",choices:["ระดับต้นทุกประเภท และระดับกลางประเภทเครื่องกำเนิดรังสี","ระดับต้นทุกประเภท และระดับกลางประเภทวัสดุกัมมันตรังสี","ระดับกลางทุกประเภท","ระดับต้นทุกประเภท","ระดับสูง"],ans:0},
+            {id:"r3-65-q50",set:"r3-65",q:"ปริมาณรังสีที่สาธารณชนได้รับต้องไม่เกินเท่าใดต่อปี และโดยเฉลี่ยใน 5 ปี จะได้รับปริมาณรังสีสูงสุดไม่เกินเท่าใดต่อปี",choices:["1 มิลลิซีเวิร์ด และ 1 มิลลิซีเวิร์ด","20 มิลลิซีเวิร์ด และ 50 มิลลิซีเวิร์ด","1 มิลลิซีเวิร์ด และ 10 มิลลิซีเวิร์ด","20 มิลลิซีเวิร์ด และ 20 มิลลิซีเวิร์ด","1 มิลลิซีเวิร์ด และ 5 มิลลิซีเวิร์ด"],ans:0},
+
+            // --- 2066 ---
+            {id:"r3-66-q1",set:"r3-66",q:"ข้อใดถูกต้องตามมาตรฐานการทิ้งขยะในโรงพยาบาล",choices:["ปีใหม่ ทิ้งเข็มและ Syringe ที่ใช้แล้ว ในถังสำหรับทิ้งของมีคม","พายุ ทิ้งหมวกคลุมผมที่ใช้แล้ว ในถังขยะสีดำ","เรซซิ่ง ทิ้งถุงมือที่ใช้แล้ว ในถังขยะสีดำ","สายน้ำ ทิ้งถุงมือที่ผสมยาเคมีบำบัดในถังขยะสีแดง","สายฟ้า ทิ้งเศษอาหารในถังขยะสีแดง"],ans:0},
+            {id:"r3-66-q2",set:"r3-66",q:"Justification หมายถึงข้อใด",choices:["การควบคุมปริมาณรังสีให้อยู่ภายใต้ขีดจำกัดการได้รับรังสี","การนำรังสีมาใช้ต้องมีประโยชน์น้อยกว่าผลที่อาจเกิดขึ้นจากการได้รับรังสี","การนำรังสีมาใช้ต้องมีประโยชน์มากกว่าผลที่อาจเกิดขึ้นจากการได้รับรังสี","การไม่นำรังสีมาใช้ในทางปฏิบัติไม่ว่าด้วยเหตุผลใดเพื่อหลีกเลี่ยงการรับรังสี","การนำรังสีมาใช้ประโยชน์ในทางปฏิบัติโดยไม่มีขีดจำกัด"],ans:2},
+            {id:"r3-66-q3",set:"r3-66",q:"การประกันคุณภาพตามระบบ PDCA ประกอบด้วยขั้นตอนอะไรบ้าง",choices:["Prepare-Do-Check-Action","Plan-Do-Check-Action","Prepare-Daily-Check-Action","Plan-Daily-Clean-Accomplish","Pick-Do-Clear-Archive"],ans:1},
+            {id:"r3-66-q4",set:"r3-66",q:"ข้อใดกล่าวถูกต้องเมื่อเพิ่ม Filtration",choices:["X-ray quality เพิ่มขึ้น, X-ray quantity ลดลง","X-ray quality ลดลง, X-ray quantity ลดลง","X-ray quality ลดลง, X-ray quantity เพิ่มขึ้น","X-ray quality เพิ่มขึ้น, X-ray quantity เพิ่มขึ้น","X-ray quality เพิ่มขึ้น, X-ray quantity ไม่เปลี่ยนแปลง"],ans:0},
+            {id:"r3-66-q5",set:"r3-66",q:"อันตรกิริยา (Interaction) ระหว่างโฟตอนและสสารแบบใดที่เกิดขึ้นบริเวณวงโคจรชั้นนอกของอะตอม และเมื่อเกิดแล้วพลังงานของโฟตอนลดลง",choices:["Pair production","Compton effect","Photodisintegration","Coherent scattering","Photoelectric effect"],ans:1},
+            {id:"r3-66-q6",set:"r3-66",q:"ข้อใดคือการเปลี่ยนสถานะพลังงานจากสภาวะกระตุ้นสู่สภาวะปกติ ค่าพลังงานดังกล่าวค่อย ๆ ปลดปล่อยออกมาแบบ Exponential สามารถสังเกตได้จากความเข้มของแสงและอุณหภูมิ ระยะเวลาที่เกิดน้อยกว่า 10^-8 วินาที",choices:["Ionization","Luminescence","Excitation","Phosphorescence","Fluorescence"],ans:4},
+            {id:"r3-66-q7",set:"r3-66",q:"ค่าการทำงานของไต (eGFR) ในข้อใด มีความเสี่ยงสูงสุดที่จะทำให้เกิดภาวะ Nephrogenic systemic fibrosis (NSF)",choices:["45 mL/min/1.73 m²","120 mL/min/1.73 m²","90 mL/min/1.73 m²","60 mL/min/1.73 m²","30 mL/min/1.73 m²"],ans:4},
+            {id:"r3-66-q8",set:"r3-66",q:"ข้อใดแสดงวิธีการป้องกันการแพร่กระจายเชื้อโรคจากการสัมผัส (Contact precautions) ได้ถูกต้อง",choices:["ล้างมือ, สวม Gown, Glove","ล้างมือ, สวม Gown, Glove, สวมหน้ากาก Surgical mask และแขวนป้าย Contact precautions","ล้างมือ, สวม Gown, Glove, สวมหน้ากาก N95 และแขวนป้าย Contact precautions","แยกผู้ป่วยไว้ที่ห้องแยก, ล้างมือ, สวม Gown, Glove, สวมหน้ากาก Surgical mask และแขวนป้าย Contact precautions","ล้างมือ, สวม Gown, Glove, แขวนป้าย Contact precautions"],ans:4},
+            {id:"r3-66-q9",set:"r3-66",q:"บุคคลซึ่งทำหน้าที่รับผิดชอบด้านความปลอดภัยจากการใช้รังสีภายในหน่วยงานคือข้อใด",choices:["นักฟิสิกส์การแพทย์ (Medical physicist)","หัวหน้าหน่วยงาน (Radiology department manager)","เจ้าหน้าที่ความปลอดภัยทางรังสี (Radiation Safety Officer: RSO)","ผู้มีอำนาจสูงสุดในองค์กร (CEO)","รังสีแพทย์ (Radiologist)"],ans:2},
+            {id:"r3-66-q10",set:"r3-66",q:"ข้อใด ไม่ใช่ ยาใน Emergency drug box ที่มีอยู่ในหน่วยงานรังสีวิทยาสำหรับช่วยชีวิตผู้ป่วยในภาวะฉุกเฉิน",choices:["Dexamethasone","Adriamycin","Diazepam","Adrenaline","Atropine"],ans:1},
+            {id:"r3-66-q11",set:"r3-66",q:"ข้อใดคือปริมาณรังสีสมมูล (Equivalent dose)",choices:["Absorbed dose x Radiation weighting factor x Tissue weighting factor","Absorbed dose x Tissue weighting factor","Absorbed dose + Tissue weighting factor","Absorbed dose + Radiation weighting factor","Absorbed dose x Radiation weighting factor"],ans:4},
+            {id:"r3-66-q12",set:"r3-66",q:"HA ย่อมาจากคำว่าอะไร",choices:["Health Award","Hospital Assurance","Hospital Assignment","Health Assurance","Hospital Accreditation"],ans:4},
+            {id:"r3-66-q13",set:"r3-66",q:"การตรวจสอบในข้อใดเป็นการวัดความเที่ยงตรงของปริมาณรังสีเอกซ์ที่ออกจากหลอดเอกซเรย์",choices:["Timer accuracy","X-ray output accuracy","X-ray output linearity","X-ray output reproducibility","X-ray output reciprocity"],ans:3},
+            {id:"r3-66-q14",set:"r3-66",q:"หากทำงานใกล้แหล่งกำเนิดรังสีที่มีความแรง 1 ไมโครซีเวิร์ตต่อชั่วโมง และอยู่ห่างจากแหล่งกำเนิดรังสี 1 เมตร หากเว้นระยะห่างจากแหล่งกำเนิดรังสีเพิ่มเป็นระยะทาง 2 เมตร ความแรงของรังสีจะลดลงเหลือเท่าใด",choices:["0.5 ไมโครซีเวิร์ตต่อชั่วโมง","1 ไมโครซีเวิร์ตต่อชั่วโมง","0.25 ไมโครซีเวิร์ตต่อชั่วโมง","0.025 ไมโครซีเวิร์ตต่อชั่วโมง","0.05 ไมโครซีเวิร์ตต่อชั่วโมง"],ans:2},
+            {id:"r3-66-q15",set:"r3-66",q:"Photon จะต้องมีพลังงานอย่างน้อยเท่าไร ในกระบวนการเกิด Pair Production",choices:["1.022 MeV","2 MeV","511 keV","1 MeV","1.022 keV"],ans:0},
+            {id:"r3-66-q16",set:"r3-66",q:"ข้อใดคือผลที่ได้จากกระบวนการ Compton Scattering",choices:["เกิด Auger Electron","เกิดการดูดกลืนพลังงานทั้งหมดของ Photon โดย Electron","เกิด Electron หลุดออกจากนิวเคลียส","เกิด Positron Pair","เกิด Scattered Photon"],ans:4},
+            {id:"r3-66-q17",set:"r3-66",q:"การหาชีพจรบริเวณใดหาได้ง่ายที่สุดและเป็นจุดสำคัญที่ใช้ในการหาชีพจรหากผู้ป่วยหมดสติ",choices:["Pedal artery","Brachial artery","Radial artery","Apical artery","Carotid artery"],ans:4},
+            {id:"r3-66-q18",set:"r3-66",q:"ปริมาณรังสีขีดจำกัดสำหรับสตรีที่ปฏิบัติงานทางรังสี ตลอดระยะเวลาตั้งครรภ์ คือข้อใด",choices:["ไม่เกิน 1.5 มิลลิซีเวิร์ต","ไม่เกิน 20 มิลลิซีเวิร์ต","ไม่เกิน 10 มิลลิซีเวิร์ต","ไม่เกิน 0.5 มิลลิซีเวิร์ต","ไม่เกิน 1.0 มิลลิซีเวิร์ต"],ans:4},
+            {id:"r3-66-q19",set:"r3-66",q:"ข้อใด ไม่ใช่ การนำหลัก ALARA มาใช้สำหรับผู้ป่วยที่มารับการถ่ายภาพทางรังสี",choices:["การใช้ DRLs เป็นระดับอ้างอิงในการตรวจแต่ละชนิด","การถ่ายภาพทางรังสีให้ได้ภาพที่มีคุณภาพดีที่สุดโดยไม่คำนึงถึงปริมาณรังสีที่ได้รับ","การใช้เทคนิคการถ่ายภาพเฉพาะสำหรับผู้ป่วยเด็กเพื่อควบคุมปริมาณรังสีที่ได้รับ","การเลือกเทคนิคการถ่ายภาพให้เหมาะสมกับผู้ป่วยแต่ละคน","การใช้อุปกรณ์กำบังรังสีเพื่อป้องกันอวัยวะที่มีความไวต่อรังสีที่อยู่ใกล้บริเวณที่ทำการตรวจ"],ans:1},
+            {id:"r3-66-q20",set:"r3-66",q:"ข้อใดเป็นกระบวนการสร้างภาพของ MRI",choices:["Chemical shift","Back projection","Iterative reconstruction","2D-Fourier transforms","Filtered back projection"],ans:3},
+            {id:"r3-66-q21",set:"r3-66",q:"ข้อใด ไม่ใช่ ผลที่เกิดจากการได้รับรังสีแบบ Deterministic Effects",choices:["Genetic mutation","Infertility","Skin redness","Cataract","Hair loss"],ans:0},
+            {id:"r3-66-q22",set:"r3-66",q:"ข้อใดกล่าว ไม่ถูกต้อง เกี่ยวกับการรักษาผู้ป่วยมะเร็งต่อมไทรอยด์ด้วยน้ำแร่ไอโอดีน มากกว่า 30 mCi",choices:["ผู้ป่วยไม่ควรมีปฏิสัมพันธ์กับบุคคลอื่นที่ไม่เกี่ยวข้อง","ผู้ป่วยจะได้รับการอธิบายขั้นตอนการรักษาอย่างละเอียดพร้อมผลข้างเคียงที่อาจจะเกิดขึ้น","หลังจากการกินน้ำแร่ไอโอดีนเพื่อการรักษาผู้ป่วยต้องดื่มน้ำตามให้มากที่สุดเท่าที่เป็นไปได้","ผู้ป่วยสามารถกลับบ้านได้ทันทีหลังจากได้รับการรักษาด้วยน้ำแร่ไอโอดีน","ผู้ป่วยจำเป็นต้องนอนรักษาตัวที่วอร์ดเฉพาะจนกว่าปริมาณรังสีที่แผ่ออกมาจากตัวผู้ป่วยที่ระยะหนึ่งเมตรต้องน้อยกว่า 70 ไมโครซีเวิร์ตต่อชั่วโมง"],ans:3},
+            {id:"r3-66-q23",set:"r3-66",q:"การแบ่งประเภทของรังสีตามความสามารถในการทำให้เกิดอันตรกิริยา (Interaction) กับตัวกลาง คือข้อใด",choices:["รังสีที่มีพลังงานสูงและรังสีที่มีพลังงานต่ำ","รังสีที่มีประจุไฟฟ้าและรังสีที่ไม่มีประจุไฟฟ้า","รังสีที่ไม่ก่อให้เกิดไอออนและรังสีที่ก่อให้เกิดไอออน","รังสีที่มีอำนาจทะลุทะลวงสูงและรังสีที่มีอำนาจทะลุทะลวงต่ำ","รังสีที่มีความถี่สูงและรังสีที่มีความถี่ต่ำ"],ans:2},
+            {id:"r3-66-q24",set:"r3-66",q:"ข้อใดกล่าว ผิด เกี่ยวกับการดูแลปฏิบัติตัวสำหรับผู้ป่วยมะเร็งปากมดลูกที่ได้รับการรักษาด้วยรังสี",choices:["ควรมีการสวนล้างช่องคลอดให้สะอาดอยู่เสมอ","หลีกเลี่ยงการขัดถูบริเวณที่ฉายรังสี","หลังการรักษาหากมีภาวะช่องคลอดแห้งสามารถพิจารณาใช้เจลเพิ่มความชุ่มชื้นให้ช่องคลอดได้","ควรรับประทานอาหารอ่อน ย่อยง่าย สุก สะอาด เพื่อป้องกันอาการท้องเสีย","งดมีเพศสัมพันธ์ในระหว่างการฉายรังสีและการใส่แร่ เพื่อป้องกันการอักเสบและติดเชื้อ"],ans:0},
+            {id:"r3-66-q25",set:"r3-66",q:"ข้อใดคือกระบวนการที่อะตอมหรือโมเลกุลได้รับพลังงานแล้วทำให้อิเล็กตรอนหลุดออกจากอะตอม ทำให้เกิดประจุลบและประจุบวก",choices:["Luminescence","Excitation","Phosphorescence","Ionization","Fluorescence"],ans:3},
+            {id:"r3-66-q26",set:"r3-66",q:"จากสัญลักษณ์นิวเคลียร์ของธาตุ 25_12 Mg ธาตุดังกล่าวมีจำนวนเลขอะตอมและจำนวนนิวตรอนเท่ากับข้อใด",choices:["12 และ 25","25 และ 13","37 และ 25","25 และ 12","12 และ 13"],ans:4},
+            {id:"r3-66-q27",set:"r3-66",q:"ข้อใดเป็นผลของการเกิดอันตรกิริยาแบบ Photodisintegration",choices:["Auger electron","Scattered photon","Compton electron","Bremsstrahlung radiation","Nuclear particle"],ans:4},
+            {id:"r3-66-q28",set:"r3-66",q:"ตัวเลือกในข้อใดเป็น Non-ionizing radiation ทั้งหมด",choices:["Visible light, Ultrasound, Low energy X-ray","Ultrasound, Radio frequency wave, Microwave","Radio frequency wave, Low energy X-ray, Gamma ray","Microwave, Ultrasound, Low energy X-ray","Radio frequency wave, Low energy X-ray"],ans:1},
+            {id:"r3-66-q29",set:"r3-66",q:"จากเกณฑ์มาตรฐาน ICRP 103 อวัยวะใดต่อไปนี้ที่ไวต่อรังสีมากที่สุด (Tissue weighting factor สูงสุด)",choices:["Brain","Thyroid","Skin","Gonad","Breast"],ans:3},
+            {id:"r3-66-q30",set:"r3-66",q:"เครื่องมือในข้อใดที่ใช้ตรวจสอบการรั่วไหลของรังสี",choices:["Densitometer","Sensitometer","Wire mesh","Thermometer","Dosimeter"],ans:4},
+            {id:"r3-66-q31",set:"r3-66",q:"ข้อใดต่อไปนี้ ไม่ใช่ สัญญาณชีพ (Vital Signs)",choices:["อัตราการหายใจ","อุณหภูมิร่างกาย","อัตราการเต้นของหัวใจ","ความดันโลหิต","คลื่นไฟฟ้าหัวใจ"],ans:4},
+            {id:"r3-66-q32",set:"r3-66",q:"ปัจจัยใดทำให้มีปริมาณรังสี (Radiation Exposure) จากเครื่องเอกซเรย์สูงที่สุด",choices:["kV ต่ำ, mAs ต่ำ และ High frequency waveform generator","kV สูง, mAs สูง และ High frequency waveform generator","kV สูง, mAs สูง และ Three phase waveform generator","kV ต่ำ, mAs สูง และ Single phase waveform generator","kV สูง, mAs ต่ำ และ Single phase waveform generator"],ans:3},
+            {id:"r3-66-q33",set:"r3-66",q:"การแผ่รังสีชนิดใด ไม่ได้มีแหล่งกำเนิดจากนิวเคลียส",choices:["แอลฟา","รังสีเอกซ์","นิวตรอน","เบตา","แกมมา"],ans:1},
+            {id:"r3-66-q34",set:"r3-66",q:"ในการออกแบบห้องเอกซเรย์ ค่าปริมาณรังสีบริเวณที่ประชาชนทั่วไปเดินผ่าน ควรจะมีค่าเท่าใด",choices:["ไม่เกิน 1 มิลลิซีเวิร์ดต่อสัปดาห์","ไม่เกิน 0.2 มิลลิซีเวิร์ดต่อสัปดาห์","ไม่เกิน 0.02 มิลลิซีเวิร์ดต่อสัปดาห์","ไม่เกิน 10 มิลลิซีเวิร์ดต่อสัปดาห์","ไม่เกิน 0.1 มิลลิซีเวิร์ดต่อสัปดาห์"],ans:2},
+            {id:"r3-66-q35",set:"r3-66",q:"ข้อใดคือรังสีประเภท Low LET",choices:["Beta particle","Alpha","Gamma","Proton particle","Neutron"],ans:2},
+            {id:"r3-66-q36",set:"r3-66",q:"Specific activity หมายถึงข้อใด",choices:["ปริมาณของสารกัมมันตรังสีต่อมวลของสารกัมมันตรังสี","ความเข้มข้นของสารกัมมันตรังสีต่อมวลของสารกัมมันตรังสี","ความแรงรังสีของสารกัมมันตรังสีต่อมวลของสารกัมมันตรังสี","ความบริสุทธิ์ของสารกัมมันตรังสี","มวลของสารกัมมันตรังสี"],ans:2},
+            {id:"r3-66-q37",set:"r3-66",q:"ข้อใดถูกต้องเกี่ยวกับค่า Half Value Layer (HVL)",choices:["เป็นค่าที่บอกถึง Beam Quality","เป็นค่าที่บอกถึง Beam Profile","เป็นค่าที่บอกถึง Beam Filtration","เป็นค่าที่บอกถึง Beam Quantity","เป็นค่าที่บอกถึง Beam Alignment"],ans:0},
+            {id:"r3-66-q38",set:"r3-66",q:"ข้อใดคือผลที่ได้จากกระบวนการ Pair Production",choices:["Positron และ Electron หลุดออกจากนิวเคลียส","Positron และ Electron รอบ ๆ นิวเคลียส","Photon สองตัวมีพลังงาน 511 keV","Photon ถูกดูดกลืนโดยนิวเคลียสและมีการปลดปล่อย Positron ออกมา","Electron หลุดออกจากนิวเคลียส"],ans:2},
+            {id:"r3-66-q39",set:"r3-66",q:"Key Performance Indicator (KPI) คืออะไร",choices:["วัตถุประสงค์ของการดำเนินงานในระยะเวลาสั้น ๆ","ดัชนีชี้วัดผลงานระดับองค์กร","ความสำเร็จของการดำเนินงานในขั้นตอนสุดท้าย","เกณฑ์ของแผนงานที่ต้องปฏิบัติ","หน่วยนับของเป้าหมายของการปฏิบัติงาน"],ans:1},
+            {id:"r3-66-q40",set:"r3-66",q:"ข้อใดใช้ในการควบคุมคุณภาพ Display monitor ในระบบ CR และ DR",choices:["Bar pattern","High contrast test object","SMPTE test pattern","TOR RAD phantom","TOR CDR phantom"],ans:2},
+            {id:"r3-66-q41",set:"r3-66",q:"ข้อใดหมายถึงอะตอมธาตุเดียวกัน (มีจำนวนโปรตอนเท่ากัน แต่เลขมวลต่างกัน)",choices:["Isomeric transition","Isobar","Isotone","Isotope","Isoelectronic"],ans:3},
+            {id:"r3-66-q42",set:"r3-66",q:"IAEA และ ICRP กำหนดให้ผู้ปฏิบัติงานกับรังสีได้รับปริมาณรังสีสะสมต่อปี โดยเฉลี่ยจากการปฏิบัติงาน 5 ปี ไม่เกินเท่าไหร่",choices:["100 mGy","20 mSv","50 mGy","20 mGy","50 mSv"],ans:1},
+            {id:"r3-66-q43",set:"r3-66",q:"การตรวจ CT-scan กรณีที่มีการฉีด Contrast media ในผู้ป่วยที่มีค่า eGFR น้อยกว่า 60 mL/min/1.73 m² และมีความจำเป็นจะต้องฉีด ยากลุ่มใดที่รังสีแพทย์จะพิจารณาเลือกใช้เพื่อลดความเสี่ยงต่อไตมากที่สุด",choices:["Low-osmolar contrast media","Ionic dimer contrast media","Iso-osmolar contrast media","Ionic monomer contrast media","High-osmolar contrast media"],ans:2},
+            {id:"r3-66-q44",set:"r3-66",q:"กระบวนการทางฟิสิกส์ชนิดใดเกิดขึ้นเมื่อรังสีถูกดูดกลืนโดยเนื้อเยื่อของร่างกายระหว่างถ่ายภาพรังสีวินิจฉัย (ทำให้เกิด Contrast บนภาพ)",choices:["Compton effect","Photoelectric absorption","Disintegration","Annihilation reaction","Pair production"],ans:1},
+            {id:"r3-66-q45",set:"r3-66",q:"หน่วยของปริมาณรังสีดูดกลืน (Absorbed dose) ตามระบบ SI คือข้อใด",choices:["Rad","Roentgen","Gray","Rem","Sievert"],ans:2},
+            {id:"r3-66-q46",set:"r3-66",q:"เมื่อตัวอ่อนในครรภ์ได้รับรังสีปริมาณสูงในช่วง Pre-implantation stage ความผิดปกติที่พบมากที่สุดคือข้อใด",choices:["Pre-leukemic induction","Neonatal death","Mental retardation","Prenatal death","Congenital abnormality"],ans:3},
+            {id:"r3-66-q47",set:"r3-66",q:"ความแตกต่างระหว่างรังสีเอกซ์ (X-ray) และ รังสีแกมมา (Gamma ray) คือข้อใด",choices:["X-ray มีมวล Gamma ray ไม่มีมวล","X-ray มีประจุ Gamma ray ไม่มีประจุ","แหล่งกำเนิด โดย X-ray เกิดที่ชั้นอิเล็กตรอน ส่วน Gamma ray เกิดที่นิวเคลียสของอะตอม","X-ray มีประจุลบ Gamma ray มีประจุบวก","แหล่งกำเนิด โดย X-ray เกิดที่นิวเคลียส ส่วน Gamma ray เกิดที่ชั้นอิเล็กตรอนของอะตอม"],ans:2},
+            {id:"r3-66-q48",set:"r3-66",q:"ข้อใด ไม่เป็นไป ตามมาตรฐาน กฎระเบียบ ข้อบังคับของห้องเอกซเรย์แผนกรังสี และ Diagnostic imaging service",choices:["ความหนาของผนังห้องได้มาตรฐานตามที่กรมวิทยาศาสตร์การแพทย์ระบุไว้","เครื่องเอกซเรย์ทุกเครื่องต้องผ่านการตรวจสอบความถูกต้อง ความปลอดภัย และความแม่นยำ โดยกรมวิทยาศาสตร์การแพทย์","การออกแบบห้องเอกซเรย์ สามารถเข้าออกได้สะดวก เมื่อเกิดปัญหาคนข้างนอกสามารถเปิดเข้าได้ทันที (โดยไม่มีระบบล็อกที่แน่นหนาหรือสัญญาณเตือนภัยรังสี)","บริเวณพื้นที่ให้บริการปลอดภัยจากรังสี ต้องมีสัญลักษณ์บ่งบอกว่าเป็นเขตบริเวณรังสีชัดเจน","ห้องตรวจได้รับการออกแบบโครงสร้างในการป้องกันอันตรายจากรังสี รวมถึงอุปกรณ์ป้องกันที่ผ่านการตรวจสอบจากกรมวิทยาศาสตร์การแพทย์"],ans:2},
+            {id:"r3-66-q49",set:"r3-66",q:"เครื่องมือที่ใช้ตรวจวัดการเปรอะเปื้อนของสารกัมมันตรังสี (Radiation contamination) ได้ดีที่สุดคือข้อใด",choices:["Geiger Muller detector","Proportional detector","Solid state detector","Liquid scintillation detector","Ionization detector"],ans:0},
+            {id:"r3-66-q50",set:"r3-66",q:"ข้อใดต่อไปนี้เป็นเป้าหมายสำคัญ (Critical target) ในการเกิดความเสียหายของเซลล์หลังจากได้รับรังสี",choices:["Cell membrane","DNA","Ribosome","Mitochondria","Cytoplasm"],ans:1}
+        ];
+
+        // --- FIREBASE SETUP MODE ---
+        // แปะคีย์จริงตรงนี้เพื่อเชื่อมต่อระบบฐานข้อมูลคลาวด์แบบ Realtime
+        const firebaseConfig = {
+            apiKey: "",
+            authDomain: "",
+            databaseURL: "",
+            projectId: "",
+            storageBucket: "",
+            messagingSenderId: "",
+            appId: ""
+        };
+
+        let db = null;
+        let isFirebaseActive = false;
+
+        if (firebaseConfig.databaseURL) {
+            try {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.database();
+                isFirebaseActive = true;
+                console.log("☁️ Connected to Firebase Realtime Database successfully.");
+            } catch (e) {
+                console.error("Firebase Initialization failed, switching to Local Memory Simulation mode.", e);
+            }
+        }
+
+        // --- APP STATE ---
+        let currentQuizData = JSON.parse(JSON.stringify(rawQuizzes)); 
+        let userAnswers = {}; // { quizId: selectedIndex }
+        let isRandomized = false;
+        
+        // ข้อมูลจำลองเมื่อไม่มี Firebase
+        let localCloudUpdates = {}; // { quizId: { ans: index, updatedBy: string } }
+
+        // --- DOM ELEMENTS ---
+        const quizContainer = document.getElementById('quizContainer');
+        const setSelector = document.getElementById('setSelector');
+        const btnRandom = document.getElementById('btnRandom');
+
+        // --- INIT APP ---
+        window.addEventListener('DOMContentLoaded', () => {
+            if (isFirebaseActive) {
+                // ดึงข้อมูล Realtime sync จาก Firebase เพื่ออัปเดตเฉลย
+                db.ref('quizzes').on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        Object.keys(data).forEach(qId => {
+                            const cloudItem = data[qId];
+                            localCloudUpdates[qId] = cloudItem;
+                            // ซิงค์ลงใน data Array หลัก
+                            const found = currentQuizData.find(x => x.id === qId);
+                            if (found) {
+                                found.ans = cloudItem.ans;
+                                found.updatedBy = cloudItem.updatedBy;
+                            }
+                        });
+                        renderQuiz();
+                    }
+                });
+            } else {
+                renderQuiz();
+            }
+        });
+
+        // --- FILTER & RENDER ---
+        setSelector.addEventListener('change', () => {
+            isRandomized = false; 
+            btnRandom.classList.remove('bg-purple-600', 'hover:bg-purple-700');
+            btnRandom.classList.add('bg-amber-500', 'hover:bg-amber-600');
+            resetDataState();
+        });
+
+        function resetDataState() {
+            // โหลดข้อมูลดิบใหม่
+            currentQuizData = JSON.parse(JSON.stringify(rawQuizzes));
+            // ปลั๊กอินคลาวด์/เมมโมรี่จำลอง
+            Object.keys(localCloudUpdates).forEach(qId => {
+                const found = currentQuizData.find(x => x.id === qId);
+                if (found) {
+                    found.ans = localCloudUpdates[qId].ans;
+                    found.updatedBy = localCloudUpdates[qId].updatedBy;
+                }
+            });
+            renderQuiz();
+        }
+
+        function renderQuiz() {
+            const currentFilter = setSelector.value;
+            let listToRender = currentQuizData;
+
+            if (currentFilter !== 'all') {
+                listToRender = currentQuizData.filter(item => item.set === currentFilter);
+            }
+
+            if (listToRender.length === 0) {
+                quizContainer.innerHTML = `<div class="text-center py-12 bg-white rounded-2xl border text-slate-400 font-medium">ไม่พบข้อสอบในชุดนี้</div>`;
+                return;
+            }
+
+            quizContainer.innerHTML = '';
+
+            listToRender.forEach((item, index) => {
+                const quizBox = document.createElement('div');
+                quizBox.className = "bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200/80 transition-all hover:shadow-md relative overflow-hidden";
+                quizBox.id = `box-${item.id}`;
+
+                // Header ข้อสอบ
+                const labelYear = item.set === 'r3-64' ? 'ปี 2564' : item.set === 'r3-65' ? 'ปี 2565' : 'ปี 2566';
+                let headerHtml = `
+                    <div class="flex justify-between items-start gap-4 mb-3">
+                        <span class="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-xs font-bold px-2.5 py-1 rounded-md border border-blue-100">
+                            <i class="fa-solid fa-graduation-cap"></i> ข้อที่ ${index + 1} (${labelYear})
+                        </span>
+                        <button onclick="openEditModal('${item.id}')" class="text-xs font-semibold text-slate-400 hover:text-cyan-600 transition-colors flex items-center gap-1 bg-slate-50 hover:bg-cyan-50 border border-slate-200 px-2 py-1 rounded-lg">
+                            <i class="fa-solid fa-pen-to-square"></i> แก้ไขเฉลยต้นฉบับ
+                        </button>
+                    </div>
+                    <h2 class="text-base sm:text-lg font-semibold text-slate-800 leading-relaxed mb-3">${item.q}</h2>
+                `;
+
+                // การจัดการรูปภาพประจำข้อ (ดักจับฟิลด์ img)
+                if (item.img && item.img.trim() !== '') {
+                    headerHtml += `
+                        <div class="my-3 text-center">
+                            <img src="${item.img}" alt="รูปภาพประจำข้อที่ ${index + 1}" class="max-h-64 mx-auto rounded-lg shadow-sm border bg-slate-50 object-contain">
+                        </div>
+                    `;
+                }
+
+                // Render ช้อยส์ตัวเลือก
+                let choicesHtml = `<div class="space-y-2.5 mt-4">`;
+                const userChoice = userAnswers[item.id];
+                
+                item.choices.forEach((choice, cIdx) => {
+                    let btnStyle = "border-slate-200 hover:bg-slate-50 text-slate-700 bg-white";
+                    let iconHtml = `<div class="w-6 h-6 rounded-full border border-slate-300 flex items-center justify-center text-xs font-bold text-slate-400 bg-slate-50 shrink-0">${cIdx + 1}</div>`;
+
+                    if (userChoice !== undefined) {
+                        // เมื่อมีการคลิกตรวจปั๊บ
+                        if (cIdx === item.ans) {
+                            // ข้อที่เฉลยถูกต้อง
+                            btnStyle = "border-emerald-500 bg-emerald-50 text-emerald-900 font-medium ring-1 ring-emerald-500";
+                            iconHtml = `<div class="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-xs font-bold text-white shrink-0"><i class="fa-solid fa-check"></i></div>`;
+                        } else if (cIdx === userChoice) {
+                            // ข้อที่ผู้ใช้ตอบผิด
+                            btnStyle = "border-red-400 bg-red-50 text-red-900 ring-1 ring-red-400";
+                            iconHtml = `<div class="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center text-xs font-bold text-white shrink-0"><i class="fa-solid fa-xmark"></i></div>`;
+                        } else {
+                            // ช้อยส์อื่นๆ ปรับความโปร่งแสงลงตามเงื่อนไข
+                            btnStyle = "border-slate-200 text-slate-400 opacity-60 bg-white pointer-events-auto";
+                        }
+                    }
+
+                    choicesHtml += `
+                        <button onclick="selectAnswer('${item.id}', ${cIdx})" class="w-full text-left p-3.5 rounded-xl border text-sm sm:text-base flex items-center gap-3 transition-all duration-150 active:scale-[0.99] ${btnStyle}">
+                            ${iconHtml}
+                            <span class="flex-1 leading-normal">${choice}</span>
+                        </button>
+                    `;
+                });
+                choicesHtml += `</div>`;
+
+                // แถบเฉลยสั้นๆ แบบกล่องสีฟ้าใต้ช้อยส์ที่เลือกแล้ว
+                let feedbackHtml = '';
+                if (userChoice !== undefined) {
+                    feedbackHtml = `
+                        <div class="mt-4 p-3 bg-cyan-50 border border-cyan-100 rounded-xl text-cyan-800 text-sm font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-lightbulb text-cyan-500"></i> เฉลยคือข้อ ${item.ans + 1}
+                        </div>
+                    `;
+                }
+
+                // ประวัติคลาวด์อัปเดตเฉลยโดย (ไม่แสดงวันเวลา)
+                let cloudUpdateHtml = '';
+                if (item.updatedBy) {
+                    cloudUpdateHtml = `
+                        <div class="mt-3 text-right">
+                            <span class="inline-block text-[11px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded">
+                                <i class="fa-solid fa-cloud text-blue-400 mr-0.5"></i> คลาวด์อัปเดตเฉลยโดย: คุณ ${item.updatedBy}
+                            </span>
+                        </div>
+                    `;
+                }
+
+                quizBox.innerHTML = headerHtml + choicesHtml + feedbackHtml + cloudUpdateHtml;
+                quizContainer.appendChild(quizBox);
+            });
+        }
+
+        // --- ANSWER SELECTION SYSTEM (เปลี่ยนช้อยส์ไปมาได้อิสระ) ---
+        function selectAnswer(quizId, choiceIndex) {
+            userAnswers[quizId] = choiceIndex;
+            renderQuiz();
+        }
+
+        // --- RANDOM MODE SYSTEM ---
+        btnRandom.addEventListener('click', () => {
+            isRandomized = true;
+            btnRandom.classList.remove('bg-amber-500', 'hover:bg-amber-600');
+            btnRandom.classList.add('bg-purple-600', 'hover:bg-purple-700');
+
+            // 1. สุ่มสลับโจทย์หลักทั้งหมด
+            for (let i = currentQuizData.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [currentQuizData[i], currentQuizData[j]] = [currentQuizData[j], currentQuizData[i]];
+            }
+
+            // 2. สับช้อยส์ภายในข้ออย่างแม่นยำ และแปลงค่า Index เฉลยใหม่ไม่ให้หลุดตำแหน่ง
+            currentQuizData.forEach(item => {
+                // เก็บอาเรย์ออบเจกต์จำค่าดั้งเดิมไว้
+                let mappedChoices = item.choices.map((c, index) => {
+                    return { text: c, isCorrect: index === item.ans };
+                });
+
+                // สุ่มสับช้อยส์ 1-5
+                for (let i = mappedChoices.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [mappedChoices[i], mappedChoices[j]] = [mappedChoices[j], mappedChoices[i]];
+                }
+
+                // สรุปข้อมูลกลับคืนลงออบเจกต์
+                item.choices = mappedChoices.map(x => x.text);
+                item.ans = mappedChoices.findIndex(x => x.isCorrect); // หาตำแหน่งดัชนีเฉลยใหม่แม่นยำ
+            });
+
+            renderQuiz();
+        });
+
+        // --- MODAL & FIREBASE DATABASE WRITE SYSTEM ---
+        function openEditModal(quizId) {
+            // ดึงข้อความและช้อยส์ดั้งเดิมจากฐานข้อมูลดิบ เพื่อป้องกันไม่ให้ผู้แก้ไขสับสนเวลาสุ่มช้อยส์อยู่
+            const originalItem = rawQuizzes.find(x => x.id === quizId);
+            const liveItem = currentQuizData.find(x => x.id === quizId);
+            if (!originalItem || !liveItem) return;
+
+            document.getElementById('modalTargetId').value = quizId;
+            document.getElementById('modalQuestionText').innerText = originalItem.q;
+            
+            const container = document.getElementById('modalChoicesContainer');
+            container.innerHTML = '';
+
+            // ใช้โครงสร้างลำดับช้อยส์ดั้งเดิมเสมอในการอัปเดต
+            originalItem.choices.forEach((choice, index) => {
+                // ค้นหาว่า ณ ปัจจุบัน ข้อนี้ถูกเฉลยไว้ที่ดัชนีไหนในเวอร์ชันดิบ
+                const isSelected = index === originalItem.ans; 
+                container.innerHTML += `
+                    <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer text-sm font-medium transition-colors">
+                        <input type="radio" name="modalAnsRadio" value="${index}" ${isSelected ? 'checked' : ''} class="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                        <span class="text-slate-700">${index + 1}. ${choice}</span>
+                    </label>
+                `;
+            });
+
+            const modal = document.getElementById('editModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.children[0].classList.remove('scale-95');
+                modal.children[0].classList.add('scale-100');
+            }, 50);
+        }
+
+        function closeEditModal() {
+            const modal = document.getElementById('editModal');
+            modal.children[0].classList.remove('scale-100');
+            modal.children[0].classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 150);
+        }
+
+        document.getElementById('editForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const quizId = document.getElementById('modalTargetId').value;
+            const newAnsIndex = parseInt(document.querySelector('input[name="modalAnsRadio"]:checked').value);
+            const editorNameStr = document.getElementById('editorName').value.trim();
+
+            if (!editorNameStr) return;
+
+            const updatePayload = {
+                ans: newAnsIndex,
+                updatedBy: editorNameStr
+            };
+
+            // อัปเดตในอาเรย์ข้อมูลต้นฉบับดั้งเดิม (รักษาสิทธิ์ของโครงสร้างดิบ)
+            const originIndex = rawQuizzes.findIndex(x => x.id === quizId);
+            if (originIndex !== -1) {
+                rawQuizzes[originIndex].ans = newAnsIndex;
+                rawQuizzes[originIndex].updatedBy = editorNameStr;
+            }
+
+            if (isFirebaseActive) {
+                // ยิงข้อมูลอัปเดตลงคลาวด์ Firebase แบบเรียลไทม์
+                db.ref(`quizzes/${quizId}`).set(updatePayload)
+                    .then(() => {
+                        alert("🎉 อัปเดตข้อมูลเฉลยขึ้น Firebase คลาวด์เรียบร้อยแล้ว!");
+                        closeEditModal();
+                    })
+                    .catch((err) => {
+                        alert("เกิดข้อผิดพลาดในการบันทึกข้อมูลคลาวด์: " + err.message);
+                    });
+            } else {
+                // ทำงานบนเบราว์เซอร์ชั่วคราวกรณีไม่ได้แปะคีย์ Firebase
+                localCloudUpdates[quizId] = updatePayload;
+                
+                // ซิงค์เข้าสู่โครงสร้างการทำงานหน้าปัจจุบัน
+                const liveItem = currentQuizData.find(x => x.id === quizId);
+                if (liveItem) {
+                    // หากอยู่ในโหมดสุ่ม ต้องประมวลผลคำตอบใหม่ให้ตรงกับช้อยส์ที่สับไปแล้ว
+                    if (isRandomized) {
+                        const originalItem = rawQuizzes.find(x => x.id === quizId);
+                        const correctText = originalItem.choices[newAnsIndex];
+                        const newLiveIndex = liveItem.choices.indexOf(correctText);
+                        liveItem.ans = newLiveIndex;
+                    } else {
+                        liveItem.ans = newAnsIndex;
+                    }
+                    liveItem.updatedBy = editorNameStr;
+                }
+
+                alert("💾 บันทึกจำลองในความจำเบราว์เซอร์สำเร็จ (ไม่ได้ระบุบัญชีเชื่อมต่อ Firebase Config)");
+                closeEditModal();
+                renderQuiz();
+            }
+        });
+    </script>
+</body>
+</html>
